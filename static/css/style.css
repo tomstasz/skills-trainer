@@ -1,0 +1,7 @@
+.full-link::after {
+    content: attr(href);
+} 
+
+.not-visible {
+    display: none;
+}

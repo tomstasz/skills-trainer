@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Index
+{% endblock title %}
+
+{% block content %}
+<form id="quiz-form" action="" method="post">
+    {% csrf_token %}
+    {{ quiz_form.as_p }}
+    <input type="submit" value="Save">
+</form>
+{% if request.POST and first_question_pk %}
+Link do testu:
+    <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_pk }}?q={{ quiz_pk }}"></a>
+{% endif %}
+{% endblock content %}
