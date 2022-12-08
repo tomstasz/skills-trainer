@@ -4,16 +4,16 @@ from django.utils.translation import gettext_lazy as _
 
 
 PROG_LANG_CHOICES = (
-    ('Java', 'Java'),
-    ('Python', 'Python'),
-    ('PHP', 'PHP'),
-    ('C++', 'C++'),
+    ("Java", "Java"),
+    ("Python", "Python"),
+    ("PHP", "PHP"),
+    ("C++", "C++"),
 )
 
 SENIORITY_CHOICES = (
-    ('junior', 'junior'),
-    ('regular', 'regular'),
-    ('senior', 'senior'),
+    ("junior", "junior"),
+    ("regular", "regular"),
+    ("senior", "senior"),
 )
 
 NUM_OF_QUESTIONS = (
@@ -23,16 +23,20 @@ NUM_OF_QUESTIONS = (
 )
 
 QUESTION_TYPE_CHOICES = (
-    ('multiple choice', 'multiple choice'),
-    ('open', 'open'),
-    ('true/false', 'true/false'),
-    ('image', 'image'),
+    ("multiple choice", "multiple choice"),
+    ("open", "open"),
+    ("true/false", "true/false"),
+    ("image", "image"),
 )
 
 
 class Quiz(models.Model):
-    prog_language = models.CharField(max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language")
-    seniority = models.CharField(_("Seniority"), max_length=64, choices=SENIORITY_CHOICES)
+    prog_language = models.CharField(
+        max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language"
+    )
+    seniority = models.CharField(
+        _("Seniority"), max_length=64, choices=SENIORITY_CHOICES
+    )
     user_name = models.CharField(max_length=120)
     email = models.CharField(max_length=120, unique=True)
     number_of_questions = models.IntegerField(choices=NUM_OF_QUESTIONS)
@@ -48,10 +52,16 @@ class Quiz(models.Model):
 class Question(models.Model):
     text = models.CharField(_("Text"), max_length=240, null=True, blank=True)
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
-    prog_language = models.CharField(max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language")
-    seniority = models.CharField(_("Seniority"), max_length=64, choices=SENIORITY_CHOICES)
+    prog_language = models.CharField(
+        max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language"
+    )
+    seniority = models.CharField(
+        _("Seniority"), max_length=64, choices=SENIORITY_CHOICES
+    )
     image = models.ImageField(upload_to="../static/images", null=True, blank=True)
-    author = models.ForeignKey("Author", on_delete=models.CASCADE, null=True, blank=True)
+    author = models.ForeignKey(
+        "Author", on_delete=models.CASCADE, null=True, blank=True
+    )
     time = models.IntegerField(default=30)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -84,4 +94,3 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.company}"
-    
