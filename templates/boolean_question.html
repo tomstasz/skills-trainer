@@ -6,7 +6,7 @@
 {% endblock scripts %}
 
 {% block title %}
-    Single question
+    Single question boolean
 {% endblock title %}
 
 {% block content %}
@@ -14,8 +14,11 @@
 <form id="question-form" action="" method="post">
     {% csrf_token %}
     <div id="question-div">
-    <label>Wpisz odpowiedź:
-    <input type="text" name="ans">
+    <label>Prawda
+    <input type="radio" name="ans" value="T">
+    </label>
+    <label>Fałsz
+    <input type="radio" name="ans" value="F">
     </label>
     <br>
     </div>

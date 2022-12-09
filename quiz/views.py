@@ -4,14 +4,15 @@ from django.http import Http404
 from django.urls import reverse
 from django.views import View
 
-from quiz.models import Question, Quiz
+from quiz.models import Question, Quiz, SENIORITY_CHOICES
 from quiz.forms import QuizForm
-from quiz.utils import template_choice
+from quiz.utils import template_choice, update_score, del_session_keys, draw_questions
 
 
 class QuizView(View):
     def get(self, request):
         form = QuizForm()
+        del_session_keys(request)
         return render(request, "index.html", {"quiz_form": form})
 
     def post(self, request):
@@ -35,10 +36,6 @@ class QuizView(View):
             ).first()
             if first_question is None:
                 raise Http404("Question not found.")
-            ctx["prog_lang"] = prog_lang
-            ctx["seniority"] = seniority
-            ctx["number_of_questions"] = number_of_questions
-            ctx["series"] = int(number_of_questions / 3)
             ctx["first_question_pk"] = first_question.pk
             ctx["quiz_pk"] = quiz.pk
         form = QuizForm()
@@ -57,19 +54,21 @@ class QuestionView(View):
                 quiz = Quiz.objects.get(pk=quiz_pk)
                 quiz.general_score = final_score
                 quiz.save()
-                del request.session["general_score"]
+                del_session_keys(request)
             return redirect(reverse("quiz:quiz-view"))
-        if not request.session.get("general_score"):
+        if request.session.get("general_score") is None:
             request.session["general_score"] = 0
-        gen_score = request.session.get("general_score")
+        if request.session.get("used_ids") is None:
+            request.session["used_ids"] = list()
+        used_ids = request.session["used_ids"]
+        if pk not in used_ids:
+            used_ids.append(pk)
+        request.session["used_ids"] = used_ids
         ctx = {}
-        if question:
-            answers = question.get_answers()
-            ctx["question"] = question
-            if question.question_type == "multiple choice":
-                ctx["answers"] = list(answers)
-        else:
-            raise Http404("Question not found.")
+        answers = question.get_answers()
+        ctx["question"] = question
+        if question.question_type == "multiple choice":
+            ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
         return render(request, template, ctx)
 
@@ -78,14 +77,16 @@ class QuestionView(View):
         answers = question.get_answers()
         quiz_pk = request.GET.get("q")
         quiz = Quiz.objects.get(pk=quiz_pk)
-        series = int(quiz.number_of_questions / 3)
+        num_in_series = int(quiz.number_of_questions / len(SENIORITY_CHOICES))
+        if request.session.get("num_in_series") is None:
+            request.session["num_in_series"] = num_in_series - 1
+        if request.session.get("seniority_level") is None:
+            request.session["seniority_level"] = quiz.seniority
         if question.question_type == "open":
             ans = answers[0].text
             user_answer = request.POST.get("ans")
             if ans == user_answer:
-                gen_score = int(request.session.get("general_score"))
-                gen_score += 1
-                request.session["general_score"] = gen_score
+                update_score(request)
         if question.question_type == "multiple choice":
             data = list(request.POST)
             data.remove("csrfmiddlewaretoken")
@@ -95,11 +96,29 @@ class QuestionView(View):
             ]
             correct_answers_ids.sort()
             if data == correct_answers_ids:
-                gen_score = int(request.session.get("general_score"))
-                gen_score += 1
-                request.session["general_score"] = gen_score
-        next_question_id = pk + 1
+                update_score(request)
+        if question.question_type == "true/false":
+            user_answer = request.POST.get("ans")
+            if user_answer == "T":
+                update_score(request)
+        current_number = int(request.session.get("num_in_series"))
+        current_number -= 1
+        request.session["num_in_series"] = current_number
+        next_question_pk = draw_questions(
+            request.session.get("seniority_level"), used_ids=request.session["used_ids"]
+        )
+        if next_question_pk is None:
+            return redirect(reverse("quiz:quiz-view"))
+        if request.session["num_in_series"] <= 0:
+            request.session["seniority_level"] = "regular"
+            request.session["num_in_series"] = num_in_series
+            del request.session["used_ids"]
+            request.session["used_ids"] = list()
+            next_question_pk = draw_questions(
+                request.session.get("seniority_level"),
+                used_ids=request.session["used_ids"],
+            )
         return redirect(
-            reverse("quiz:question-view", kwargs={"pk": next_question_id})
+            reverse("quiz:question-view", kwargs={"pk": next_question_pk})
             + f"?q={quiz_pk}"
         )
