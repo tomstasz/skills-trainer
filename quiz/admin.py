@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Author, Answer, Quiz, Question
+from .models import Author, Answer, Quiz, Question, Translation
 
 
 @admin.register(Author)
@@ -23,3 +23,8 @@ class QuestionAdmin(admin.ModelAdmin):
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ("question", "text", "is_correct")
     list_filter = ("created_at", "updated_at")
+
+
+@admin.register(Translation)
+class TranslationAdmin(admin.ModelAdmin):
+    list_display = ("text", "language")

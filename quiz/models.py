@@ -29,6 +29,12 @@ QUESTION_TYPE_CHOICES = (
     ("image", "image"),
 )
 
+LANGUAGE_CHOICES = (
+    ("English", "English"),
+    ("Polish", "Polish"),
+    ("German", "German"),
+)
+
 
 class Quiz(models.Model):
     prog_language = models.CharField(
@@ -50,7 +56,7 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    text = models.CharField(_("Text"), max_length=240, null=True, blank=True)
+    text = models.CharField(max_length=240, null=True, blank=True)
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     prog_language = models.CharField(
         max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language"
@@ -63,6 +69,7 @@ class Question(models.Model):
         "Author", on_delete=models.CASCADE, null=True, blank=True
     )
     time = models.IntegerField(default=30)
+    translation = models.ForeignKey("Translation", on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -77,10 +84,11 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    text = models.CharField(_("Text"), max_length=240, null=True, blank=True)
+    text = models.CharField(max_length=240, null=True, blank=True)
     image = models.ImageField(upload_to="../static/images", null=True, blank=True)
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    translation = models.ForeignKey("Translation", on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -94,3 +102,10 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.company}"
+
+class Translation(models.Model):
+    text = models.CharField(max_length=240, null=True, blank=True)
+    language = models.CharField(max_length=64, choices=LANGUAGE_CHOICES)
+
+    def __str__(self):
+        return f"{self.language}: {self.text}"
