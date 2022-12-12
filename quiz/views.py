@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.urls import reverse
 from django.views import View
+from django.utils.translation import activate
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES
 from quiz.forms import QuizForm

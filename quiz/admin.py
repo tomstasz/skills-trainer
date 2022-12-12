@@ -1,30 +1,28 @@
 from django.contrib import admin
 
-from .models import Author, Answer, Quiz, Question, Translation
+from .models import Author, Answer, Quiz, Question
+from modeltranslation.admin import TranslationAdmin
 
 
-@admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ("name", "company")
 
 
-@admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
     list_display = ("user_name", "prog_language", "seniority")
     readonly_fields = ("general_score", "junior_score", "regular_score", "senior_score")
 
 
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionAdmin(TranslationAdmin):
     list_filter = ("created_at", "updated_at")
 
 
-@admin.register(Answer)
-class AnswerAdmin(admin.ModelAdmin):
+class AnswerAdmin(TranslationAdmin):
     list_display = ("question", "text", "is_correct")
     list_filter = ("created_at", "updated_at")
 
 
-@admin.register(Translation)
-class TranslationAdmin(admin.ModelAdmin):
-    list_display = ("text", "language")
+admin.site.register(Author, AuthorAdmin)
+admin.site.register(Quiz, QuizAdmin)
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Answer, AnswerAdmin)

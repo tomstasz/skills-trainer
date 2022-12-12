@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 18:00+0100\n"
+"POT-Creation-Date: 2022-12-12 16:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,18 +18,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: prog_level_test/settings.py:121
+#: prog_level_test/settings.py:117
 msgid "English"
 msgstr ""
 
-#: prog_level_test/settings.py:122
+#: prog_level_test/settings.py:118
 msgid "Polish"
 msgstr ""
 
-#: quiz/models.py:40 quiz/models.py:58
-msgid "Text"
+#: quiz/models.py:41 quiz/models.py:60
+msgid "Programming Language"
 msgstr ""
 
-#: quiz/models.py:41
+#: quiz/models.py:43
 msgid "Seniority"
+msgstr ""
+
+#: quiz/models.py:44
+msgid "User Name"
+msgstr ""
+
+#: quiz/models.py:46
+msgid "Number of questions"
 msgstr ""

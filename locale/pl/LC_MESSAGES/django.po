@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 18:00+0100\n"
+"POT-Creation-Date: 2022-12-12 16:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,18 +20,26 @@ msgstr ""
 "(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
 "n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
-#: prog_level_test/settings.py:121
+#: prog_level_test/settings.py:117
 msgid "English"
-msgstr "angielski"
+msgstr ""
 
-#: prog_level_test/settings.py:122
+#: prog_level_test/settings.py:118
 msgid "Polish"
-msgstr "polski"
+msgstr ""
 
-#: quiz/models.py:40 quiz/models.py:58
-msgid "Text"
-msgstr "Treść"
+#: quiz/models.py:41 quiz/models.py:60
+msgid "Programming Language"
+msgstr "Język programowania"
 
-#: quiz/models.py:41
+#: quiz/models.py:43
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
+
+#: quiz/models.py:44
+msgid "User Name"
+msgstr "Nazwa użytkownika"
+
+#: quiz/models.py:46
+msgid "Number of questions"
+msgstr "Liczba pytań"

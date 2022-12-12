@@ -11,9 +11,9 @@ PROG_LANG_CHOICES = (
 )
 
 SENIORITY_CHOICES = (
-    ("junior", "junior"),
-    ("regular", "regular"),
-    ("senior", "senior"),
+    (1, "junior"),
+    (2, "regular"),
+    (3, "senior"),
 )
 
 NUM_OF_QUESTIONS = (
@@ -38,14 +38,12 @@ LANGUAGE_CHOICES = (
 
 class Quiz(models.Model):
     prog_language = models.CharField(
-        max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language"
+        max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
     )
-    seniority = models.CharField(
-        _("Seniority"), max_length=64, choices=SENIORITY_CHOICES
-    )
-    user_name = models.CharField(max_length=120)
+    seniority = models.IntegerField(choices=SENIORITY_CHOICES, verbose_name=_("Seniority"))
+    user_name = models.CharField( _("User Name"), max_length=120)
     email = models.CharField(max_length=120, unique=True)
-    number_of_questions = models.IntegerField(choices=NUM_OF_QUESTIONS)
+    number_of_questions = models.IntegerField( _("Number of questions"), choices=NUM_OF_QUESTIONS)
     general_score = models.IntegerField(default=0)
     junior_score = models.IntegerField(default=0)
     regular_score = models.IntegerField(default=0)
@@ -59,17 +57,14 @@ class Question(models.Model):
     text = models.CharField(max_length=240, null=True, blank=True)
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     prog_language = models.CharField(
-        max_length=64, choices=PROG_LANG_CHOICES, verbose_name="Programming Language"
+        max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
     )
-    seniority = models.CharField(
-        _("Seniority"), max_length=64, choices=SENIORITY_CHOICES
-    )
+    seniority = models.IntegerField(choices=SENIORITY_CHOICES)
     image = models.ImageField(upload_to="../static/images", null=True, blank=True)
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True
     )
     time = models.IntegerField(default=30)
-    translation = models.ForeignKey("Translation", on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -88,7 +83,6 @@ class Answer(models.Model):
     image = models.ImageField(upload_to="../static/images", null=True, blank=True)
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    translation = models.ForeignKey("Translation", on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -102,10 +96,3 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.company}"
-
-class Translation(models.Model):
-    text = models.CharField(max_length=240, null=True, blank=True)
-    language = models.CharField(max_length=64, choices=LANGUAGE_CHOICES)
-
-    def __str__(self):
-        return f"{self.language}: {self.text}"
