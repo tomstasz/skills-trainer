@@ -6,6 +6,20 @@
 {% endblock title %}
 
 {% block content %}
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
+<!--  -->
+<form id="timezone-form" action="{% url 'quiz:quiz-view' %}" method="post">
+    {% csrf_token %}
+    <label for="timezone">Time zone:</label>
+    <select name="timezone">
+        {% for city, tz in timezones.items %}
+        <option value="{{ tz }}"{% if tz == TIME_ZONE %}selected{% endif %}>{{ city }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" id="timezone-submit" value="Set">
+</form>
+<!--  -->
 <form id="quiz-form" action="" method="post">
     {% csrf_token %}
     {{ quiz_form.as_p }}

@@ -9,16 +9,31 @@ from quiz.models import Question, Quiz, SENIORITY_CHOICES
 from quiz.forms import QuizForm
 from quiz.utils import template_choice, update_score, del_session_keys, draw_questions
 
+TIMEZONES = {
+    "----": "",
+    "Warsaw": "Europe/Warsaw",
+    "New York": "America/New_York",
+}
+
 
 class QuizView(View):
     def get(self, request):
         form = QuizForm()
         del_session_keys(request)
-        return render(request, "index.html", {"quiz_form": form})
+        return render(
+            request, "index.html", {"quiz_form": form, "timezones": TIMEZONES}
+        )
 
     def post(self, request):
-        form = QuizForm(request.POST)
         ctx = {}
+        if (
+            "timezone" in request.POST
+            and request.session.get("django_timezone") != request.POST.get("timezone")
+            and not "email" in request.POST
+        ):
+            request.session["django_timezone"] = request.POST["timezone"]
+            return redirect("/")
+        form = QuizForm(request.POST)
         if form.is_valid():
             prog_lang = form.cleaned_data["prog_language"]
             seniority = form.cleaned_data["seniority"]
@@ -41,6 +56,7 @@ class QuizView(View):
             ctx["quiz_pk"] = quiz.pk
         form = QuizForm()
         ctx["quiz_form"] = form
+        ctx["timezones"] = TIMEZONES
         return render(request, "index.html", ctx)
 
 

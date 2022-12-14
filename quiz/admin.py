@@ -10,16 +10,22 @@ class AuthorAdmin(admin.ModelAdmin):
 
 class QuizAdmin(admin.ModelAdmin):
     list_display = ("user_name", "prog_language", "seniority")
-    readonly_fields = ("general_score", "junior_score", "regular_score", "senior_score")
+    readonly_fields = (
+        "general_score",
+        "junior_score",
+        "regular_score",
+        "senior_score",
+        "created_at",
+    )
 
 
 class QuestionAdmin(TranslationAdmin):
-    list_filter = ("created_at", "updated_at")
+    readonly_fields = ("created_at",)
 
 
 class AnswerAdmin(TranslationAdmin):
     list_display = ("question", "text", "is_correct")
-    list_filter = ("created_at", "updated_at")
+    readonly_fields = ("created_at",)
 
 
 admin.site.register(Author, AuthorAdmin)
