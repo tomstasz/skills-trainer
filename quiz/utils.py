@@ -12,10 +12,13 @@ def template_choice(question_type):
         return "boolean_question.html"
 
 
-def update_score(request):
-    gen_score = int(request.session.get("general_score"))
-    gen_score += 1
-    request.session["general_score"] = gen_score
+def update_score(request, seniority_level):
+    # gen_score = int(request.session.get("general_score"))
+    # gen_score += 1
+    request.session["general_score"] += 1
+    # if request.session.get(seniority_level) is not None:
+    #     request.session[seniority_level] += 1
+
 
 
 def del_session_keys(request):
@@ -44,3 +47,6 @@ def draw_questions(seniority_level, used_ids):
     if len(ids) > 0:
         return ids[0]
     return
+
+def calculate_score_for_serie(request, seniority):
+    pass

@@ -74,7 +74,7 @@ class Question(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.seniority}: {self.text}"
+        return f"{self.text}"
 
     def get_answers(self):
         return self.answer_set.all()

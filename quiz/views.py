@@ -7,7 +7,7 @@ from django.utils.translation import activate
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES
 from quiz.forms import QuizForm
-from quiz.utils import template_choice, update_score, del_session_keys, draw_questions
+from quiz.utils import template_choice, update_score, del_session_keys, draw_questions, calculate_score_for_serie
 
 TIMEZONES = {
     "----": "",
@@ -99,11 +99,11 @@ class QuestionView(View):
             request.session["num_in_series"] = num_in_series - 1
         if request.session.get("seniority_level") is None:
             request.session["seniority_level"] = quiz.seniority
-        if question.question_type == "open":
+        if question.question_type == "open" or question.question_type == "true/false":
             ans = answers[0].text
             user_answer = request.POST.get("ans")
             if ans == user_answer:
-                update_score(request)
+                update_score(request, request.session["seniority_level"])
         if question.question_type == "multiple choice":
             data = list(request.POST)
             data.remove("csrfmiddlewaretoken")
@@ -113,11 +113,7 @@ class QuestionView(View):
             ]
             correct_answers_ids.sort()
             if data == correct_answers_ids:
-                update_score(request)
-        if question.question_type == "true/false":
-            user_answer = request.POST.get("ans")
-            if user_answer == "T":
-                update_score(request)
+                update_score(request, request.session["seniority_level"])
         current_number = int(request.session.get("num_in_series"))
         current_number -= 1
         request.session["num_in_series"] = current_number
@@ -128,7 +124,9 @@ class QuestionView(View):
             # raise Http404("Question not found.")
             return redirect(reverse("quiz:quiz-view"))
         next_question = Question.objects.get(pk=next_question_pk)
+        # single serie of question ends
         if request.session["num_in_series"] <= 0:
+            calculate_score_for_serie(request, request.session["seniority_level"])
             request.session["seniority_level"] += 1
             if request.session["seniority_level"] > len(SENIORITY_CHOICES):
                 print("Gratulacje - koniec testu!")

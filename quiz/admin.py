@@ -20,6 +20,7 @@ class QuizAdmin(admin.ModelAdmin):
 
 
 class QuestionAdmin(TranslationAdmin):
+    list_display = ("seniority", "text", "question_type")
     readonly_fields = ("created_at",)
 
 
