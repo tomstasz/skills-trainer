@@ -125,9 +125,14 @@ class QuestionView(View):
             request.session.get("seniority_level"), used_ids=request.session["used_ids"]
         )
         if next_question_pk is None:
+            # raise Http404("Question not found.")
             return redirect(reverse("quiz:quiz-view"))
+        next_question = Question.objects.get(pk=next_question_pk)
         if request.session["num_in_series"] <= 0:
-            request.session["seniority_level"] = "regular"
+            request.session["seniority_level"] += 1
+            if request.session["seniority_level"] > len(SENIORITY_CHOICES):
+                print("Gratulacje - koniec testu!")
+                return redirect(reverse("quiz:quiz-view"))
             request.session["num_in_series"] = num_in_series
             del request.session["used_ids"]
             request.session["used_ids"] = list()
@@ -135,6 +140,10 @@ class QuestionView(View):
                 request.session.get("seniority_level"),
                 used_ids=request.session["used_ids"],
             )
+            next_question = Question.objects.get(pk=next_question_pk)
+            if next_question_pk is None:
+                return redirect(reverse("quiz:quiz-view"))
+                # raise Http404("Question not found.")
         return redirect(
             reverse("quiz:question-view", kwargs={"pk": next_question_pk})
             + f"?q={quiz_pk}"

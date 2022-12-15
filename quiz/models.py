@@ -65,7 +65,7 @@ class Question(models.Model):
     prog_language = models.CharField(
         max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
     )
-    seniority = models.IntegerField(choices=SENIORITY_CHOICES)
+    seniority = models.IntegerField(choices=SENIORITY_CHOICES, db_index=True)
     image = models.ImageField(upload_to="../static/images", null=True, blank=True)
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True

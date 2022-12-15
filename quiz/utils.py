@@ -27,6 +27,8 @@ def del_session_keys(request):
         del request.session["seniority_level"]
     if request.session.get("used_ids") is not None:
         del request.session["used_ids"]
+    # if request.session.get("django_timezone") is not None:
+    #     del request.session["django_timezone"]
     print("Session clear")
 
 
