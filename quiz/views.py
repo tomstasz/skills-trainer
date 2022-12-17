@@ -7,7 +7,14 @@ from django.utils.translation import activate
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES
 from quiz.forms import QuizForm
-from quiz.utils import template_choice, update_score, del_session_keys, draw_questions, calculate_score_for_serie
+from quiz.utils import (
+    template_choice,
+    update_score,
+    del_session_keys,
+    draw_questions,
+    calculate_score_for_serie,
+    save_results,
+)
 
 TIMEZONES = {
     "----": "",
@@ -65,16 +72,14 @@ class QuestionView(View):
         try:
             question = Question.objects.get(pk=pk)
         except ObjectDoesNotExist:
-            if request.session.get("general_score"):
-                final_score = request.session["general_score"]
-                quiz_pk = request.GET.get("q")
-                quiz = Quiz.objects.get(pk=quiz_pk)
-                quiz.general_score = final_score
-                quiz.save()
-                del_session_keys(request)
-            return redirect(reverse("quiz:quiz-view"))
+            raise Http404("Question not found.")
         if request.session.get("general_score") is None:
             request.session["general_score"] = 0
+            request.session["junior_score"] = 0
+            request.session["regular_score"] = 0
+            request.session["senior_score"] = 0
+            request.session["seniority_level"] = question.seniority
+            request.session["start_sen"] = question.seniority
         if request.session.get("used_ids") is None:
             request.session["used_ids"] = list()
         used_ids = request.session["used_ids"]
@@ -93,17 +98,17 @@ class QuestionView(View):
         question = Question.objects.get(pk=pk)
         answers = question.get_answers()
         quiz_pk = request.GET.get("q")
-        quiz = Quiz.objects.get(pk=quiz_pk)
-        num_in_series = int(quiz.number_of_questions / len(SENIORITY_CHOICES))
         if request.session.get("num_in_series") is None:
-            request.session["num_in_series"] = num_in_series - 1
-        if request.session.get("seniority_level") is None:
-            request.session["seniority_level"] = quiz.seniority
+            quiz = Quiz.objects.get(pk=quiz_pk)
+            num_in_series = int(quiz.number_of_questions / len(SENIORITY_CHOICES))
+            request.session["num_in_series"] = num_in_series
+            request.session["num_of_questions"] = quiz.number_of_questions
+        # different question types check
         if question.question_type == "open" or question.question_type == "true/false":
             ans = answers[0].text
             user_answer = request.POST.get("ans")
             if ans == user_answer:
-                update_score(request, request.session["seniority_level"])
+                update_score(request)
         if question.question_type == "multiple choice":
             data = list(request.POST)
             data.remove("csrfmiddlewaretoken")
@@ -113,25 +118,25 @@ class QuestionView(View):
             ]
             correct_answers_ids.sort()
             if data == correct_answers_ids:
-                update_score(request, request.session["seniority_level"])
-        current_number = int(request.session.get("num_in_series"))
-        current_number -= 1
-        request.session["num_in_series"] = current_number
+                update_score(request)
+        request.session["num_in_series"] -= 1
         next_question_pk = draw_questions(
             request.session.get("seniority_level"), used_ids=request.session["used_ids"]
         )
         if next_question_pk is None:
-            # raise Http404("Question not found.")
-            return redirect(reverse("quiz:quiz-view"))
+            raise Http404("Question not found.")
         next_question = Question.objects.get(pk=next_question_pk)
         # single serie of question ends
         if request.session["num_in_series"] <= 0:
-            calculate_score_for_serie(request, request.session["seniority_level"])
+            results = calculate_score_for_serie(request)
+            save_results(results, quiz_pk)
             request.session["seniority_level"] += 1
             if request.session["seniority_level"] > len(SENIORITY_CHOICES):
                 print("Gratulacje - koniec testu!")
                 return redirect(reverse("quiz:quiz-view"))
-            request.session["num_in_series"] = num_in_series
+            request.session["num_in_series"] = int(
+                request.session["num_of_questions"] / len(SENIORITY_CHOICES)
+            )
             del request.session["used_ids"]
             request.session["used_ids"] = list()
             next_question_pk = draw_questions(
@@ -140,8 +145,7 @@ class QuestionView(View):
             )
             next_question = Question.objects.get(pk=next_question_pk)
             if next_question_pk is None:
-                return redirect(reverse("quiz:quiz-view"))
-                # raise Http404("Question not found.")
+                raise Http404("Question not found.")
         return redirect(
             reverse("quiz:question-view", kwargs={"pk": next_question_pk})
             + f"?q={quiz_pk}"
