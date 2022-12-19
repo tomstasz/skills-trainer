@@ -4,6 +4,7 @@ from django.http import Http404
 from django.urls import reverse
 from django.views import View
 from django.utils.translation import activate
+from rest_framework import viewsets
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES
 from quiz.forms import QuizForm
@@ -15,6 +16,7 @@ from quiz.utils import (
     calculate_score_for_serie,
     save_results,
 )
+from quiz.serializers import QuizSerializer
 
 TIMEZONES = {
     "----": "",
@@ -102,7 +104,8 @@ class QuestionView(View):
             quiz = Quiz.objects.get(pk=quiz_pk)
             num_in_series = int(quiz.number_of_questions / len(SENIORITY_CHOICES))
             request.session["num_in_series"] = num_in_series
-            request.session["num_of_questions"] = quiz.number_of_questions
+            request.session["max_num_of_questions"] = quiz.number_of_questions
+            request.session["current_num_of_questions"] = quiz.number_of_questions
         # different question types check
         if question.question_type == "open" or question.question_type == "true/false":
             ans = answers[0].text
@@ -120,6 +123,7 @@ class QuestionView(View):
             if data == correct_answers_ids:
                 update_score(request)
         request.session["num_in_series"] -= 1
+        request.session["current_num_of_questions"] -= 1
         next_question_pk = draw_questions(
             request.session.get("seniority_level"), used_ids=request.session["used_ids"]
         )
@@ -130,15 +134,21 @@ class QuestionView(View):
         if request.session["num_in_series"] <= 0:
             results = calculate_score_for_serie(request)
             save_results(results, quiz_pk)
-            request.session["seniority_level"] += 1
-            if request.session["seniority_level"] > len(SENIORITY_CHOICES):
+            seniority_change_flag = False
+            if request.session["seniority_level"] != len(SENIORITY_CHOICES):
+                request.session["seniority_level"] += 1
+                seniority_change_flag = True
+            if (
+                request.session["seniority_level"] > len(SENIORITY_CHOICES)
+                or request.session["current_num_of_questions"] == 0
+            ):
                 print("Gratulacje - koniec testu!")
                 return redirect(reverse("quiz:quiz-view"))
             request.session["num_in_series"] = int(
-                request.session["num_of_questions"] / len(SENIORITY_CHOICES)
+                request.session["max_num_of_questions"] / len(SENIORITY_CHOICES)
             )
-            del request.session["used_ids"]
-            request.session["used_ids"] = list()
+            if seniority_change_flag:
+                request.session["used_ids"] = list()
             next_question_pk = draw_questions(
                 request.session.get("seniority_level"),
                 used_ids=request.session["used_ids"],
@@ -150,3 +160,8 @@ class QuestionView(View):
             reverse("quiz:question-view", kwargs={"pk": next_question_pk})
             + f"?q={quiz_pk}"
         )
+
+
+class ResultsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer

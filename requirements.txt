@@ -17,3 +17,4 @@ django-celery-beat==2.3.0
 psycopg2
 black
 django-modeltranslation
+djangorestframework==3.13.1
