@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Results
+{% endblock title %}
+
+{% block content %}
+<form id="result-form" action="{% url 'quiz:result-view' %}" method="post">
+    {% csrf_token %}
+    {{ quiz_form.as_p }}
+    <input type="submit" id="result-submit" value="Find">
+</form>
+
+{% if quiz %}
+<div id="percent-div">
+    <p><b>User: {{ quiz.user_name }}</b></p>
+    <p><b>General Score:</b> {{ general_score }}%</p>
+    {% if junior_score %}
+        <p><b>Junior Score:</b> {{ junior_score }}%</p>
+    {% endif %}
+    {% if regular_score %}
+        <p><b>Regular Score:</b> {{ regular_score }}%</p>
+    {% endif %}
+    {% if senior_score %}
+        <p><b>Senior Score:</b> {{ senior_score }}%</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock content %}

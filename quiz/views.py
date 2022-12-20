@@ -7,7 +7,7 @@ from django.utils.translation import activate
 from rest_framework import viewsets
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES
-from quiz.forms import QuizForm
+from quiz.forms import QuizForm, UserEmailForm
 from quiz.utils import (
     template_choice,
     update_score,
@@ -15,6 +15,8 @@ from quiz.utils import (
     draw_questions,
     calculate_score_for_serie,
     save_results,
+    calculate_percentage,
+    calculate_if_higher_seniority,
 )
 from quiz.serializers import QuizSerializer
 
@@ -81,7 +83,6 @@ class QuestionView(View):
             request.session["regular_score"] = 0
             request.session["senior_score"] = 0
             request.session["seniority_level"] = question.seniority
-            request.session["start_sen"] = question.seniority
         if request.session.get("used_ids") is None:
             request.session["used_ids"] = list()
         used_ids = request.session["used_ids"]
@@ -106,6 +107,8 @@ class QuestionView(View):
             request.session["num_in_series"] = num_in_series
             request.session["max_num_of_questions"] = quiz.number_of_questions
             request.session["current_num_of_questions"] = quiz.number_of_questions
+            seniority_level = request.session["seniority_level"]
+            request.session["finished_series"] = {1: 0, 2: 0, 3: 0}
         # different question types check
         if question.question_type == "open" or question.question_type == "true/false":
             ans = answers[0].text
@@ -132,12 +135,18 @@ class QuestionView(View):
         next_question = Question.objects.get(pk=next_question_pk)
         # single serie of question ends
         if request.session["num_in_series"] <= 0:
+            current_seniority = request.session.get("seniority_level")
+            request.session.get("finished_series")[str(current_seniority)] += 1
             results = calculate_score_for_serie(request)
             save_results(results, quiz_pk)
-            seniority_change_flag = False
-            if request.session["seniority_level"] != len(SENIORITY_CHOICES):
+            seniority_change_flag = calculate_if_higher_seniority(request, results)
+            if (
+                seniority_change_flag
+                and request.session["seniority_level"] != len(SENIORITY_CHOICES)
+                and request.session.get("finished_series")[str(current_seniority)] == 1
+            ):
                 request.session["seniority_level"] += 1
-                seniority_change_flag = True
+                request.session["used_ids"] = list()
             if (
                 request.session["seniority_level"] > len(SENIORITY_CHOICES)
                 or request.session["current_num_of_questions"] == 0
@@ -147,8 +156,6 @@ class QuestionView(View):
             request.session["num_in_series"] = int(
                 request.session["max_num_of_questions"] / len(SENIORITY_CHOICES)
             )
-            if seniority_change_flag:
-                request.session["used_ids"] = list()
             next_question_pk = draw_questions(
                 request.session.get("seniority_level"),
                 used_ids=request.session["used_ids"],
@@ -165,3 +172,18 @@ class QuestionView(View):
 class ResultsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
+
+
+class ResultFormView(View):
+    def get(self, request):
+        form = UserEmailForm()
+        return render(request, "results.html", {"quiz_form": form})
+
+    def post(self, request):
+        form = UserEmailForm()
+        if "email" in request.POST:
+            quiz = Quiz.objects.filter(email=request.POST["email"]).first()
+            ctx = calculate_percentage(request, quiz)
+            ctx["quiz"] = quiz
+        ctx["quiz_form"] = form
+        return render(request, "results.html", ctx)

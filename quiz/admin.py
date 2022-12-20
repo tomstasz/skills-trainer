@@ -16,6 +16,9 @@ class QuizAdmin(admin.ModelAdmin):
         "regular_score",
         "senior_score",
         "created_at",
+        "number_of_junior_series",
+        "number_of_regular_series",
+        "number_of_senior_series",
     )
 
 

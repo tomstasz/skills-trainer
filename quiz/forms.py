@@ -12,6 +12,9 @@ class QuizForm(forms.ModelForm):
             "junior_score",
             "regular_score",
             "senior_score",
+            "number_of_junior_series",
+            "number_of_regular_series",
+            "number_of_senior_series",
             "created_at",
         ]
 
@@ -22,3 +25,14 @@ class QuizForm(forms.ModelForm):
         "seniority",
         "number_of_questions",
     ]
+
+
+class UserEmailForm(forms.ModelForm):
+    email = forms.ModelChoiceField(
+        queryset=Quiz.objects.values_list("email", flat=True)
+    )
+
+    class Meta:
+        model = Quiz
+        fields = ["email"]
+        widgets = {"email": forms.Select()}

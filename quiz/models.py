@@ -51,8 +51,11 @@ class Quiz(models.Model):
     )
     general_score = models.IntegerField(default=0)
     junior_score = models.IntegerField(default=0)
+    number_of_junior_series = models.IntegerField(default=0)
     regular_score = models.IntegerField(default=0)
+    number_of_regular_series = models.IntegerField(default=0)
     senior_score = models.IntegerField(default=0)
+    number_of_senior_series = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

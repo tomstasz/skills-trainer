@@ -1,6 +1,6 @@
 import random
 
-from quiz.models import Question, Quiz
+from quiz.models import Question, Quiz, SENIORITY_CHOICES
 
 
 def template_choice(question_type):
@@ -56,36 +56,15 @@ def draw_questions(seniority_level, used_ids):
 
 
 def calculate_score_for_serie(request):
+    num_of_finished_series = request.session["finished_series"]
     gen_score = request.session.get("general_score")
-    seniority_swicher = {
-        1: junior(request),
-        2: regular(request),
-        3: senior(request),
-        None: {},
-    }
-    current_seniority = request.session.get("seniority_level")
-    results = seniority_swicher[current_seniority]
-    results["general_score"] = gen_score
-    return results
-
-
-def junior(request):
-    return {"junior_score": request.session.get("junior_score")}
-
-
-def regular(request):
-    return {
-        "junior_score": request.session.get("junior_score"),
-        "regular_score": request.session.get("regular_score"),
-    }
-
-
-def senior(request):
-    return {
-        "senior_score": request.session.get("senior_score"),
-        "junior_score": request.session.get("junior_score"),
-        "regular_score": request.session.get("regular_score"),
-    }
+    scores = dict()
+    for k, v in SENIORITY_CHOICES:
+        if num_of_finished_series[str(k)] > 0:
+            scores[f"{v}_score"] = request.session.get(f"{v}_score")
+            scores[f"number_of_{v}_series"] = num_of_finished_series[str(k)]
+    scores["general_score"] = gen_score
+    return scores
 
 
 def save_results(results, quiz_pk):
@@ -93,3 +72,52 @@ def save_results(results, quiz_pk):
     for key, value in results.items():
         vars(quiz)[key] = value
     quiz.save()
+
+
+def calculate_percentage(request, quiz):
+    """We calculate percentage of correct answers
+    taking into account number of finished series
+    from each seniority level"""
+    single_serie_length = quiz.number_of_questions / len(SENIORITY_CHOICES)
+    num_of_finished_series = {
+        "1": quiz.number_of_junior_series,
+        "2": quiz.number_of_regular_series,
+        "3": quiz.number_of_senior_series,
+    }
+    general_multiplayer = 100 / quiz.number_of_questions
+    seniority = quiz.seniority
+    ctx = {}
+    for k, v in SENIORITY_CHOICES:
+        if seniority <= k:
+            multiplayer = calculate_multiplayer(
+                k, num_of_finished_series, single_serie_length
+            )
+            ctx[f"{v}_score"] = round(vars(quiz)[f"{v}_score"] * multiplayer, 1)
+    ctx["general_score"] = round(quiz.general_score * general_multiplayer, 1)
+    return ctx
+
+
+def calculate_if_higher_seniority(request, results):
+    score = 0
+    current_seniority = request.session["seniority_level"]
+    single_serie_length = int(
+        request.session["max_num_of_questions"] / len(SENIORITY_CHOICES)
+    )
+    num_of_finished_series = request.session["finished_series"]
+    for k, v in SENIORITY_CHOICES:
+        if k == current_seniority:
+            multiplayer = calculate_multiplayer(
+                k, num_of_finished_series, single_serie_length
+            )
+            current_serie_score = results[f"{v}_score"]
+    score = current_serie_score * multiplayer
+    return True if score >= 66 else False
+
+
+def calculate_multiplayer(key, num_of_finished_series, single_serie_length):
+    multiplayer = (
+        100 / (num_of_finished_series[str(key)] * single_serie_length)
+        if num_of_finished_series[str(key)] > 1
+        else 100 / single_serie_length
+    )
+    return multiplayer
