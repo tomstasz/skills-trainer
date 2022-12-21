@@ -9,7 +9,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ("user_name", "prog_language", "seniority")
+    list_display = ("user_name", "email", "prog_language", "seniority")
     readonly_fields = (
         "general_score",
         "junior_score",
@@ -23,7 +23,7 @@ class QuizAdmin(admin.ModelAdmin):
 
 
 class QuestionAdmin(TranslationAdmin):
-    list_display = ("seniority", "text", "question_type")
+    list_display = ("seniority", "question_type", "text",)
     readonly_fields = ("created_at",)
 
 

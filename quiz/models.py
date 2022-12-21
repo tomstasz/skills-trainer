@@ -60,12 +60,15 @@ class Quiz(models.Model):
     number_of_senior_series = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        verbose_name_plural = "quizes"
+
     def __str__(self):
         return f"{self.prog_language} - {self.user_name}"
 
 
 class Question(models.Model):
-    text = RichTextUploadingField(null=True, blank=True)
+    text = RichTextUploadingField(null=True, blank=True, config_name='special')
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     prog_language = models.CharField(
         max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
@@ -88,7 +91,7 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    text = RichTextUploadingField(null=True, blank=True)
+    text = RichTextUploadingField(null=True, blank=True, config_name='special')
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
