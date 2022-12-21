@@ -11,9 +11,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -37,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "ckeditor",
+    "ckeditor_uploader",
     "quiz",
 ]
 
@@ -57,7 +61,7 @@ ROOT_URLCONF = "prog_level_test.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates'],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -78,7 +82,7 @@ WSGI_APPLICATION = "prog_level_test.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -119,17 +123,25 @@ LANGUAGES = [
     ("pl", gettext("Polish")),
 ]
 
-LOCALE_PATHS = [BASE_DIR / "locale"]
+# LOCALE_PATHS = [BASE_DIR / "locale"]
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
-# Static files (CSS, JavaScript, Images)
+# Static files  (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "/static/"
+# STATIC_ROOT = "static"
+
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-    BASE_DIR / 'static' / 'images',
+    os.path.join(BASE_DIR, "static/"),
+    os.path.join(BASE_DIR, "static/images"),
+    os.path.join(BASE_DIR, "static/css"),
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'quiz/media'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from ckeditor_uploader.fields import RichTextUploadingField
+
 
 PROG_LANG_CHOICES = (
     ("Java", "Java"),
@@ -63,13 +65,12 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    text = models.CharField(max_length=240, null=True, blank=True)
+    text = RichTextUploadingField(null=True, blank=True)
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     prog_language = models.CharField(
         max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
     )
     seniority = models.IntegerField(choices=SENIORITY_CHOICES, db_index=True)
-    image = models.ImageField(upload_to="../static/images", null=True, blank=True)
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -87,8 +88,7 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    text = models.CharField(max_length=240, null=True, blank=True)
-    image = models.ImageField(upload_to="../static/images", null=True, blank=True)
+    text = RichTextUploadingField(null=True, blank=True)
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)

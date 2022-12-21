@@ -10,7 +10,9 @@
 {% endblock title %}
 
 {% block content %}
-<h3>{{ question.text }}</h3>
+<div class="question-div">
+    {{ question.text | safe }}
+</div>
 <form id="question-form" action="" method="post">
     {% csrf_token %}
     <div id="question-div">

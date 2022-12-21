@@ -18,3 +18,4 @@ psycopg2
 black
 django-modeltranslation
 djangorestframework==3.13.1
+django-ckeditor

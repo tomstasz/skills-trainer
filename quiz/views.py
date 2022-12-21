@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
 from django.urls import reverse
 from django.views import View
@@ -42,6 +42,7 @@ class QuizView(View):
             and request.session.get("django_timezone") != request.POST.get("timezone")
             and not "email" in request.POST
         ):
+            print("Wpadł if!")
             request.session["django_timezone"] = request.POST["timezone"]
             return redirect("/")
         form = QuizForm(request.POST)
@@ -73,10 +74,7 @@ class QuizView(View):
 
 class QuestionView(View):
     def get(self, request, pk):
-        try:
-            question = Question.objects.get(pk=pk)
-        except ObjectDoesNotExist:
-            raise Http404("Question not found.")
+        question = get_object_or_404(Question, pk=pk)
         if request.session.get("general_score") is None:
             request.session["general_score"] = 0
             request.session["junior_score"] = 0
