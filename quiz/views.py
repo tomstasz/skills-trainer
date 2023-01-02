@@ -42,7 +42,6 @@ class QuizView(View):
             and request.session.get("django_timezone") != request.POST.get("timezone")
             and not "email" in request.POST
         ):
-            print("Wpadł if!")
             request.session["django_timezone"] = request.POST["timezone"]
             return redirect("/")
         form = QuizForm(request.POST)
@@ -90,6 +89,7 @@ class QuestionView(View):
         ctx = {}
         answers = question.get_answers()
         ctx["question"] = question
+        ctx["time"] = question.time
         if question.question_type == "multiple choice":
             ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
@@ -149,7 +149,6 @@ class QuestionView(View):
                 request.session["seniority_level"] > len(SENIORITY_CHOICES)
                 or request.session["current_num_of_questions"] == 0
             ):
-                print("Gratulacje - koniec testu!")
                 return redirect(reverse("quiz:quiz-view"))
             request.session["num_in_series"] = int(
                 request.session["max_num_of_questions"] / len(SENIORITY_CHOICES)

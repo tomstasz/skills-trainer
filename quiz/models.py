@@ -29,7 +29,6 @@ QUESTION_TYPE_CHOICES = (
     ("multiple choice", "multiple choice"),
     ("open", "open"),
     ("true/false", "true/false"),
-    ("image", "image"),
 )
 
 LANGUAGE_CHOICES = (
@@ -68,7 +67,7 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    text = RichTextUploadingField(null=True, blank=True, config_name='special')
+    text = RichTextUploadingField(null=True, blank=True, config_name="special")
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     prog_language = models.CharField(
         max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
@@ -77,7 +76,7 @@ class Question(models.Model):
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True
     )
-    time = models.IntegerField(default=30)
+    time = models.IntegerField(default=30, help_text="duration in minutes")
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -91,7 +90,7 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    text = RichTextUploadingField(null=True, blank=True, config_name='special')
+    text = RichTextUploadingField(null=True, blank=True, config_name="special")
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)

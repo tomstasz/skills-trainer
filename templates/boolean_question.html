@@ -10,24 +10,34 @@
 {% endblock title %}
 
 {% block content %}
-<div class="question-div">
-    {{ question.text | safe }}
-</div>
-<form id="question-form" action="" method="post">
-    {% csrf_token %}
-    <div id="question-div">
-    <label>Prawda
-    <input type="radio" name="ans" value="T">
-    </label>
-    <label>Fałsz
-    <input type="radio" name="ans" value="F">
-    </label>
-    <br>
+<div class="row">
+    <div class="col">
+        <div class="question-div" id="question-div" data-value={{ question.text }}>
+            {{ question.text | safe }}
+        </div>
     </div>
-    <button type="submit" id="question-submit">Send</button>
-</form>
-
-{% if question.is_author %}
-    <p>Autor: {{ question.author }}</p>
-{% endif %}
+    <div class="col" id="timer">
+        <div class="not-visible" id="time" data-value={{ time }}></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+    <form id="question-form" action="" method="post">
+        {% csrf_token %}
+        <div id="question-div">
+        <label>Prawda
+        <input type="radio" name="ans" value="T">
+        </label>
+        <label>Fałsz
+        <input type="radio" name="ans" value="F">
+        </label>
+        <br>
+        </div>
+        <button type="submit" id="question-submit">Send</button>
+    </form>
+    {% if question.is_author %}
+        <p>Autor: {{ question.author }}</p>
+    {% endif %}
+</div>
+</div>
 {% endblock content %}

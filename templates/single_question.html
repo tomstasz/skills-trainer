@@ -10,23 +10,33 @@
 {% endblock title %}
 
 {% block content %}
-<div class="question-div">
-    {{ question.text | safe }}
-</div>
-<form id="question-form" action="" method="post">
-    {% csrf_token %}
-    <div id="question-div">
-    {% for answer in answers %}
-    <label>
-    <input type="checkbox" name={{ answer.pk }} value={{ answer.text }}>{{ answer.text | safe}}
-    </label>
-    <br>
-    {% endfor %}
+<div class="row">
+<div class="col">
+    <div class="question-div" id="question-div" data-value={{ question.text }}>
+        {{ question.text | safe }}
     </div>
-    <button type="submit" id="question-submit">Send</button>
-</form>
-
-{% if question.is_author %}
-    <p>Autor: {{ question.author }}</p>
-{% endif %}
+</div>
+<div class="col" id="timer">
+    <div class="not-visible" id="time" data-value={{ time }}></div>
+</div>
+</div>
+<div class="row">
+    <div class="col">
+    <form id="question-form" action="" method="post">
+        {% csrf_token %}
+        <div id="question-div">
+        {% for answer in answers %}
+        <label>
+        <input type="checkbox" name={{ answer.pk }} value={{ answer.text }}>{{ answer.text | safe}}
+        </label>
+        <br>
+        {% endfor %}
+        </div>
+        <button type="submit" id="question-submit">Send</button>
+    </form>
+    {% if question.is_author %}
+        <p>Autor: {{ question.author }}</p>
+    {% endif %}
+    </div>
+</div>
 {% endblock content %}

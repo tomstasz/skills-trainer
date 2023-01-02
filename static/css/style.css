@@ -5,3 +5,11 @@
 .not-visible {
     display: none;
 }
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
