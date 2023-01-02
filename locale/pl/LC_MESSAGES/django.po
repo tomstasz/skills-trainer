@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 16:50+0100\n"
+"POT-Creation-Date: 2023-01-02 16:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,26 +20,55 @@ msgstr ""
 "(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
 "n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
-#: prog_level_test/settings.py:117
+#: prog_level_test/settings.py:122
 msgid "English"
 msgstr ""
 
-#: prog_level_test/settings.py:118
+#: prog_level_test/settings.py:123
 msgid "Polish"
 msgstr ""
 
-#: quiz/models.py:41 quiz/models.py:60
+#: quiz/models.py:43 quiz/models.py:73
 msgid "Programming Language"
 msgstr "Język programowania"
 
-#: quiz/models.py:43
+#: quiz/models.py:46
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
-#: quiz/models.py:44
+#: quiz/models.py:48
 msgid "User Name"
 msgstr "Nazwa użytkownika"
 
-#: quiz/models.py:46
+#: quiz/models.py:51
 msgid "Number of questions"
 msgstr "Liczba pytań"
+
+#: templates/boolean_question.html:29
+msgid "True"
+msgstr "Prawda"
+
+#: templates/boolean_question.html:32
+msgid "False"
+msgstr "Fałsz"
+
+#: templates/boolean_question.html:37 templates/single_question.html:36
+#: templates/single_question_open.html:34
+msgid "Send"
+msgstr "Wyślij"
+
+#: templates/index.html:19
+msgid "Time zone:"
+msgstr "Strefa czasowa:"
+
+#: templates/index.html:25
+msgid "Set"
+msgstr "Ustaw"
+
+#: templates/index.html:31
+msgid "Save"
+msgstr "Zapisz"
+
+#: templates/single_question_open.html:29
+msgid "Your answer"
+msgstr "Twoja odpowiedź"
