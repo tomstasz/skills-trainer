@@ -39,9 +39,8 @@ LANGUAGE_CHOICES = (
 
 
 class Quiz(models.Model):
-    prog_language = models.CharField(
-        max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
-    )
+    category = models.ManyToManyField("Category", verbose_name=_("category"))
+    technology = models.ManyToManyField("Technology", verbose_name=_("technology"))
     seniority = models.IntegerField(
         choices=SENIORITY_CHOICES, verbose_name=_("Seniority")
     )
@@ -63,15 +62,14 @@ class Quiz(models.Model):
         verbose_name_plural = "quizes"
 
     def __str__(self):
-        return f"{self.prog_language} - {self.user_name}"
+        return f"{self.technology} - {self.user_name}"
 
 
 class Question(models.Model):
     text = RichTextUploadingField(null=True, blank=True, config_name="special")
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
-    prog_language = models.CharField(
-        max_length=64, choices=PROG_LANG_CHOICES, verbose_name=_("Programming Language")
-    )
+    category = models.ForeignKey("Category", on_delete=models.CASCADE, null=True)
+    technology = models.ForeignKey("Technology", on_delete=models.CASCADE, null=True)
     seniority = models.IntegerField(choices=SENIORITY_CHOICES, db_index=True)
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True
@@ -105,3 +103,23 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.company}"
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        verbose_name_plural = "categories"
+
+    def __str__(self):
+        return self.name
+
+
+class Technology(models.Model):
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        verbose_name_plural = "technologies"
+
+    def __str__(self):
+        return self.name

@@ -21,7 +21,8 @@ class QuizForm(forms.ModelForm):
     field_order = [
         "user_name",
         "email",
-        "prog_language",
+        "category",
+        "technology",
         "seniority",
         "number_of_questions",
     ]

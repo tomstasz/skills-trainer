@@ -46,20 +46,22 @@ class QuizView(View):
             return redirect("/")
         form = QuizForm(request.POST)
         if form.is_valid():
-            prog_lang = form.cleaned_data["prog_language"]
+            category = form.cleaned_data["category"]
+            technology = form.cleaned_data["technology"]
             seniority = form.cleaned_data["seniority"]
             user_name = form.cleaned_data["user_name"]
             email = form.cleaned_data["email"]
             number_of_questions = form.cleaned_data["number_of_questions"]
             quiz = Quiz.objects.create(
-                prog_language=prog_lang,
                 seniority=seniority,
                 user_name=user_name,
                 email=email,
                 number_of_questions=number_of_questions,
             )
+            quiz.category.set(category)
+            quiz.technology.set(technology)
             first_question = Question.objects.filter(
-                prog_language=prog_lang, seniority=seniority
+                category__in=category, technology__in=technology, seniority=seniority
             ).first()
             if first_question is None:
                 raise Http404("Question not found.")

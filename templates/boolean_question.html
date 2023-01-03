@@ -25,7 +25,6 @@
     <div class="col">
     <form id="question-form" action="" method="post">
         {% csrf_token %}
-        <div id="question-div">
         <label>{% translate "True" %}
         <input type="radio" name="ans" value="T">
         </label>
@@ -33,7 +32,6 @@
         <input type="radio" name="ans" value="F">
         </label>
         <br>
-        </div>
         <button type="submit" id="question-submit">{% translate "Send" %}</button>
     </form>
     {% if question.is_author %}

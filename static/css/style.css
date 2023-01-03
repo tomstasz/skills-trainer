@@ -13,3 +13,13 @@
 .left {
     float: left;
 }
+
+label {
+    display: inline-block;
+    padding-left: 20px;
+}
+
+input[type="checkbox"] {
+    margin-left: -20px;
+    margin-top: 4px;
+}

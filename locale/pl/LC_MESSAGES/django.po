@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-02 16:39+0100\n"
+"POT-Creation-Date: 2023-01-03 16:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,32 +28,36 @@ msgstr ""
 msgid "Polish"
 msgstr ""
 
-#: quiz/models.py:43 quiz/models.py:73
-msgid "Programming Language"
-msgstr "Język programowania"
+#: quiz/models.py:42
+msgid "category"
+msgstr "Obszar"
 
-#: quiz/models.py:46
+#: quiz/models.py:43
+msgid "technology"
+msgstr "Technologia"
+
+#: quiz/models.py:45
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
-#: quiz/models.py:48
+#: quiz/models.py:47
 msgid "User Name"
 msgstr "Nazwa użytkownika"
 
-#: quiz/models.py:51
+#: quiz/models.py:50
 msgid "Number of questions"
 msgstr "Liczba pytań"
 
-#: templates/boolean_question.html:29
+#: templates/boolean_question.html:28
 msgid "True"
 msgstr "Prawda"
 
-#: templates/boolean_question.html:32
+#: templates/boolean_question.html:31
 msgid "False"
 msgstr "Fałsz"
 
-#: templates/boolean_question.html:37 templates/single_question.html:36
-#: templates/single_question_open.html:34
+#: templates/boolean_question.html:35 templates/single_question.html:34
+#: templates/single_question_open.html:33
 msgid "Send"
 msgstr "Wyślij"
 
@@ -65,10 +69,10 @@ msgstr "Strefa czasowa:"
 msgid "Set"
 msgstr "Ustaw"
 
-#: templates/index.html:31
+#: templates/index.html:32
 msgid "Save"
 msgstr "Zapisz"
 
-#: templates/single_question_open.html:29
-msgid "Your answer"
-msgstr "Twoja odpowiedź"
+#: templates/single_question_open.html:28
+msgid "Your answer:"
+msgstr "Twoja odpowiedź:"
