@@ -24,6 +24,8 @@ def update_score(request):
 
 
 def del_session_keys(request):
+    """Utility function cleaning session keys
+    for local testing purposes"""
     if request.session.get("general_score") is not None:
         del request.session["general_score"]
     if request.session.get("num_in_series") is not None:
@@ -56,6 +58,8 @@ def draw_questions(seniority_level, used_ids):
 
 
 def calculate_score_for_serie(request):
+    """Prepares dict with number of finished series
+    and score for each seniority level"""
     num_of_finished_series = request.session["finished_series"]
     gen_score = request.session.get("general_score")
     scores = dict()
@@ -75,7 +79,7 @@ def save_results(results, quiz_pk):
 
 
 def calculate_percentage(request, quiz):
-    """We calculate percentage of correct answers
+    """Calculate percentage of correct answers
     taking into account number of finished series
     from each seniority level"""
     single_serie_length = quiz.number_of_questions / len(SENIORITY_CHOICES)
@@ -92,12 +96,14 @@ def calculate_percentage(request, quiz):
             multiplayer = calculate_multiplayer(
                 k, num_of_finished_series, single_serie_length
             )
+            # vars allows direct operations on object fields values
             ctx[f"{v}_score"] = round(vars(quiz)[f"{v}_score"] * multiplayer, 1)
     ctx["general_score"] = round(quiz.general_score * general_multiplayer, 1)
     return ctx
 
 
 def calculate_if_higher_seniority(request, results):
+    """Calculates single serie punctation to check if certain percentage was achieved"""
     score = 0
     current_seniority = request.session["seniority_level"]
     single_serie_length = int(
@@ -115,6 +121,8 @@ def calculate_if_higher_seniority(request, results):
 
 
 def calculate_multiplayer(key, num_of_finished_series, single_serie_length):
+    """Calculates multiplayer for single serie, or for larger number of series
+    if seniority was not changed (first serie result didnt meet the match)"""
     multiplayer = (
         100 / (num_of_finished_series[str(key)] * single_serie_length)
         if num_of_finished_series[str(key)] > 1
