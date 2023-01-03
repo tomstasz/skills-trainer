@@ -6,13 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
 
 
-PROG_LANG_CHOICES = (
-    ("Java", "Java"),
-    ("Python", "Python"),
-    ("PHP", "PHP"),
-    ("C++", "C++"),
-)
-
 SENIORITY_CHOICES = (
     (1, "junior"),
     (2, "regular"),
@@ -68,8 +61,8 @@ class Quiz(models.Model):
 class Question(models.Model):
     text = RichTextUploadingField(null=True, blank=True, config_name="special")
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
-    category = models.ForeignKey("Category", on_delete=models.CASCADE, null=True)
-    technology = models.ForeignKey("Technology", on_delete=models.CASCADE, null=True)
+    category = models.ForeignKey("Category", on_delete=models.CASCADE)
+    technology = models.ForeignKey("Technology", on_delete=models.CASCADE)
     seniority = models.IntegerField(choices=SENIORITY_CHOICES, db_index=True)
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True

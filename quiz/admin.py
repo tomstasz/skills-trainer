@@ -19,6 +19,8 @@ class QuizAdmin(admin.ModelAdmin):
         "number_of_junior_series",
         "number_of_regular_series",
         "number_of_senior_series",
+        "category",
+        "technology",
     )
 
 
