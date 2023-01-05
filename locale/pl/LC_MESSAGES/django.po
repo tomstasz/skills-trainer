@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-03 16:44+0100\n"
+"POT-Creation-Date: 2023-01-05 16:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,23 +28,23 @@ msgstr ""
 msgid "Polish"
 msgstr ""
 
-#: quiz/models.py:42
+#: quiz/models.py:35
 msgid "category"
 msgstr "Obszar"
 
-#: quiz/models.py:43
+#: quiz/models.py:36
 msgid "technology"
 msgstr "Technologia"
 
-#: quiz/models.py:45
+#: quiz/models.py:38
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
-#: quiz/models.py:47
+#: quiz/models.py:40
 msgid "User Name"
 msgstr "Nazwa użytkownika"
 
-#: quiz/models.py:50
+#: quiz/models.py:43
 msgid "Number of questions"
 msgstr "Liczba pytań"
 
@@ -72,6 +72,39 @@ msgstr "Ustaw"
 #: templates/index.html:32
 msgid "Save"
 msgstr "Zapisz"
+
+#: templates/results.html:13
+msgid "Find"
+msgstr "Znajdź"
+
+#: templates/results.html:18
+msgid "User:"
+msgstr "Użytkownik:"
+
+#: templates/results.html:19
+msgid "Initial level:"
+msgstr "Poziom startowy:"
+
+#: templates/results.html:22
+msgid "Junior Score:"
+msgstr "Poziom junior:"
+
+#: templates/results.html:23 templates/results.html:28
+#: templates/results.html:33 templates/results.html:37
+msgid "Number of questions:"
+msgstr "Liczba pytań:"
+
+#: templates/results.html:27
+msgid "Regular Score:"
+msgstr "Poziom regular:"
+
+#: templates/results.html:32
+msgid "Senior Score:"
+msgstr "Poziom senior:"
+
+#: templates/results.html:36
+msgid "General Score:"
+msgstr "Wynik całościowy:"
 
 #: templates/single_question_open.html:28
 msgid "Your answer:"

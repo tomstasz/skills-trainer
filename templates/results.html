@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}
     Results
@@ -9,22 +10,31 @@
 <form id="result-form" action="{% url 'quiz:result-view' %}" method="post">
     {% csrf_token %}
     {{ quiz_form.as_p }}
-    <input type="submit" id="result-submit" value="Find">
+    <button type="submit" id="result-submit">{% translate "Find" %}</button>
 </form>
-
+<br>
 {% if quiz %}
 <div id="percent-div">
-    <p><b>User: {{ quiz.user_name }}</b></p>
-    <p><b>General Score:</b> {{ general_score }}%</p>
-    {% if junior_score %}
-        <p><b>Junior Score:</b> {{ junior_score }}%</p>
+    <h4>{% translate "User:" %} {{ quiz.user_name }}</h4>
+    <p>{% translate "Initial level:" %} {{ seniority }}</p>
+    <br>
+    {% if junior_score is not None and junior_questions > 0  %}
+        <p><b>{% translate "Junior Score:" %} </b><span style="color:red;">{{ junior_score }}%</span></p>
+        <p>{% translate "Number of questions:" %} {{ junior_questions }}</p>
     {% endif %}
-    {% if regular_score %}
-        <p><b>Regular Score:</b> {{ regular_score }}%</p>
+    <br>
+    {% if regular_score is not None and regular_questions > 0 %}
+        <p><b>{% translate "Regular Score:" %} </b><span style="color:red;">{{ regular_score }}%</span></p>
+        <p>{% translate "Number of questions:" %} {{ regular_questions }}</p>
     {% endif %}
-    {% if senior_score %}
-        <p><b>Senior Score:</b> {{ senior_score }}%</p>
+    <br>
+    {% if senior_score is not None and senior_questions > 0 %}
+        <p><b>{% translate "Senior Score:" %} </b><span style="color:red;">{{ senior_score }}%</span></p>
+        <p>{% translate "Number of questions:" %} {{ senior_questions }}</p>
     {% endif %}
+    <br>
+    <p><b>{% translate "General Score:" %} </b><span style="color:red;">{{ general_score }}%</span></p>
+    <p>{% translate "Number of questions:" %} {{ quiz.number_of_questions }}</p>
 </div>
 {% endif %}
 {% endblock content %}

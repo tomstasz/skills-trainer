@@ -28,6 +28,8 @@ TIMEZONES = {
     "New York": "America/New_York",
 }
 
+MAX_SENIORITY_LEVEL = len(SENIORITY_CHOICES)
+
 
 class QuizView(View):
     def get(self, request):
@@ -105,7 +107,7 @@ class QuestionView(View):
         quiz_pk = request.GET.get("q")
         if request.session.get("num_in_series") is None:
             quiz = Quiz.objects.get(pk=quiz_pk)
-            num_in_series = int(quiz.number_of_questions / len(SENIORITY_CHOICES))
+            num_in_series = int(quiz.number_of_questions / MAX_SENIORITY_LEVEL)
             request.session["num_in_series"] = num_in_series
             request.session["max_num_of_questions"] = quiz.number_of_questions
             request.session["current_num_of_questions"] = quiz.number_of_questions
@@ -159,20 +161,38 @@ class QuestionView(View):
             results = calculate_score_for_serie(request)
             save_results(results, quiz_pk)
             seniority_change_flag = calculate_if_higher_seniority(request, results)
-            if (
+            current_seniority_finished_series = request.session.get("finished_series")[
+                str(current_seniority)
+            ]
+            higher_seniority_finished_series = (
+                request.session.get("finished_series")[str(current_seniority + 1)]
+                if current_seniority != MAX_SENIORITY_LEVEL
+                else 0
+            )
+            if (  # Upgrade seniority
                 seniority_change_flag
-                and current_seniority != len(SENIORITY_CHOICES)
-                and request.session.get("finished_series")[str(current_seniority)] == 1
+                and current_seniority != MAX_SENIORITY_LEVEL
+                and current_seniority_finished_series == 1
+                and higher_seniority_finished_series == 0
             ):
                 request.session["seniority_level"] += 1
-                request.session["used_ids"] = list()
+                request.session["used_ids"] = request.session.get("used_technologies")[
+                    str(current_technology)
+                ]
             if (
-                request.session["seniority_level"] > len(SENIORITY_CHOICES)
+                not seniority_change_flag and current_seniority != 1
+            ):  # Downgrade seniority
+                request.session["seniority_level"] -= 1
+                request.session["used_ids"] = request.session.get("used_technologies")[
+                    str(current_technology)
+                ]
+            if (  # Quiz is finished
+                request.session["seniority_level"] > MAX_SENIORITY_LEVEL
                 or request.session["current_num_of_questions"] == 0
             ):
                 return redirect(reverse("quiz:quiz-view"))
             request.session["num_in_series"] = int(
-                request.session["max_num_of_questions"] / len(SENIORITY_CHOICES)
+                request.session["max_num_of_questions"] / MAX_SENIORITY_LEVEL
             )
         next_question_pk = draw_questions(
             seniority_level=request.session.get("seniority_level"),
@@ -204,4 +224,7 @@ class ResultFormView(View):
             ctx = calculate_percentage(request, quiz)
             ctx["quiz"] = quiz
         ctx["quiz_form"] = form
+        for k, v in SENIORITY_CHOICES:
+            if k == quiz.seniority:
+                ctx["seniority"] = v
         return render(request, "results.html", ctx)

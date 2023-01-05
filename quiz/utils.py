@@ -110,12 +110,14 @@ def calculate_percentage(request, quiz):
     seniority = quiz.seniority
     ctx = {}
     for k, v in SENIORITY_CHOICES:
-        if seniority <= k:
-            multiplayer = calculate_multiplayer(
-                k, num_of_finished_series, single_serie_length
-            )
-            # vars allows direct operations on object fields values
-            ctx[f"{v}_score"] = round(vars(quiz)[f"{v}_score"] * multiplayer, 1)
+        multiplayer = calculate_multiplayer(
+            k, num_of_finished_series, single_serie_length
+        )
+        # vars allows direct operations on object fields values
+        ctx[f"{v}_score"] = round(vars(quiz)[f"{v}_score"] * multiplayer, 1)
+        ctx[f"{v}_questions"] = int(
+            single_serie_length * num_of_finished_series[str(k)]
+        )
     ctx["general_score"] = round(quiz.general_score * general_multiplayer, 1)
     return ctx
 
