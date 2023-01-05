@@ -69,6 +69,4 @@ $(function() {
 
     timeStart(time);
 
-
-
 });

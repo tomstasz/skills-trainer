@@ -4,6 +4,7 @@ from django.http import Http404
 from django.urls import reverse
 from django.views import View
 from django.utils.translation import activate
+from django.utils.html import strip_tags
 from rest_framework import viewsets
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES
@@ -17,6 +18,7 @@ from quiz.utils import (
     save_results,
     calculate_percentage,
     calculate_if_higher_seniority,
+    remove_duplicates,
 )
 from quiz.serializers import QuizSerializer
 
@@ -107,11 +109,18 @@ class QuestionView(View):
             request.session["num_in_series"] = num_in_series
             request.session["max_num_of_questions"] = quiz.number_of_questions
             request.session["current_num_of_questions"] = quiz.number_of_questions
-            seniority_level = request.session["seniority_level"]
             request.session["finished_series"] = {1: 0, 2: 0, 3: 0}
+            request.session["used_technologies"] = {}
+            request.session["categories"] = [
+                category.id for category in quiz.category.all()
+            ]
+            request.session["technologies"] = [
+                technology.id for technology in quiz.technology.all()
+            ]
+            request.session["current_technology"] = question.technology.id
         # different question types check
         if question.question_type == "open" or question.question_type == "true/false":
-            ans = answers[0].text
+            ans = strip_tags(answers[0].text)
             user_answer = request.POST.get("ans")
             if ans == user_answer:
                 update_score(request)
@@ -127,22 +136,32 @@ class QuestionView(View):
                 update_score(request)
         request.session["num_in_series"] -= 1
         request.session["current_num_of_questions"] -= 1
-        next_question_pk = draw_questions(
-            request.session.get("seniority_level"), used_ids=request.session["used_ids"]
-        )
-        if next_question_pk is None:
-            raise Http404("Question not found.")
-        next_question = Question.objects.get(pk=next_question_pk)
-        # single serie of question ends
-        if request.session["num_in_series"] <= 0:
+        if request.session["num_in_series"] <= 0:  # single serie of question ends
             current_seniority = request.session.get("seniority_level")
+            current_technology = request.session.get("current_technology")
+            if (
+                str(current_technology)
+                not in request.session.get("used_technologies").keys()
+            ):
+                request.session.get("used_technologies")[
+                    str(current_technology)
+                ] = remove_duplicates(request.session["used_ids"])
+            else:
+                stored_ids = request.session.get("used_technologies")[
+                    str(current_technology)
+                ]
+                last_ids = request.session.get("used_ids")
+                store_ids = remove_duplicates(stored_ids + last_ids)
+                request.session.get("used_technologies")[
+                    str(current_technology)
+                ] = store_ids
             request.session.get("finished_series")[str(current_seniority)] += 1
             results = calculate_score_for_serie(request)
             save_results(results, quiz_pk)
             seniority_change_flag = calculate_if_higher_seniority(request, results)
             if (
                 seniority_change_flag
-                and request.session["seniority_level"] != len(SENIORITY_CHOICES)
+                and current_seniority != len(SENIORITY_CHOICES)
                 and request.session.get("finished_series")[str(current_seniority)] == 1
             ):
                 request.session["seniority_level"] += 1
@@ -155,13 +174,13 @@ class QuestionView(View):
             request.session["num_in_series"] = int(
                 request.session["max_num_of_questions"] / len(SENIORITY_CHOICES)
             )
-            next_question_pk = draw_questions(
-                request.session.get("seniority_level"),
-                used_ids=request.session["used_ids"],
-            )
-            next_question = Question.objects.get(pk=next_question_pk)
-            if next_question_pk is None:
-                raise Http404("Question not found.")
+        next_question_pk = draw_questions(
+            seniority_level=request.session.get("seniority_level"),
+            categories=request.session.get("categories"),
+            technology=request.session.get("current_technology"),
+            used_ids=request.session.get("used_ids"),
+        )
+        next_question = get_object_or_404(Question, pk=next_question_pk)
         return redirect(
             reverse("quiz:question-view", kwargs={"pk": next_question_pk})
             + f"?q={quiz_pk}"

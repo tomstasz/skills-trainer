@@ -28,24 +28,42 @@ def del_session_keys(request):
     for local testing purposes"""
     if request.session.get("general_score") is not None:
         del request.session["general_score"]
-    if request.session.get("num_in_series") is not None:
-        del request.session["num_in_series"]
+    if request.session.get("junior_score") is not None:
+        del request.session["junior_score"]
+    if request.session.get("regular_score") is not None:
+        del request.session["regular_score"]
+    if request.session.get("senior_score") is not None:
+        del request.session["senior_score"]
     if request.session.get("seniority_level") is not None:
         del request.session["seniority_level"]
     if request.session.get("used_ids") is not None:
         del request.session["used_ids"]
-    if request.session.get("next_question_level") is not None:
-        del request.session["next_question_level"]
-    if request.session.get("current_get_seniority") is not None:
-        del request.session["current_get_seniority"]
+    if request.session.get("num_in_series") is not None:
+        del request.session["num_in_series"]
+    if request.session.get("max_num_of_questions") is not None:
+        del request.session["max_num_of_questions"]
+    if request.session.get("current_num_of_questions") is not None:
+        del request.session["current_num_of_questions"]
+    if request.session.get("finished_series") is not None:
+        del request.session["finished_series"]
+    if request.session.get("used_technologies") is not None:
+        del request.session["used_technologies"]
+    if request.session.get("categories") is not None:
+        del request.session["categories"]
+    if request.session.get("technologies") is not None:
+        del request.session["technologies"]
+    if request.session.get("current_technology") is not None:
+        del request.session["current_technology"]
     # if request.session.get("django_timezone") is not None:
     #     del request.session["django_timezone"]
     print("Session clear")
 
 
-def draw_questions(seniority_level, used_ids):
+def draw_questions(seniority_level, categories, technology, used_ids):
     ids = list(
-        Question.objects.filter(seniority=seniority_level)
+        Question.objects.filter(
+            seniority=seniority_level, category__in=categories, technology=technology
+        )
         .exclude(id__in=used_ids)
         .values_list("pk", flat=True)
     )
@@ -129,3 +147,10 @@ def calculate_multiplayer(key, num_of_finished_series, single_serie_length):
         else 100 / single_serie_length
     )
     return multiplayer
+
+
+def remove_duplicates(data):
+    """Makes set out of list from request.session
+    to remove potential duplicates in used ids"""
+    new_set = set(data)
+    return list(new_set)
