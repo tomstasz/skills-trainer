@@ -156,3 +156,15 @@ def remove_duplicates(data):
     to remove potential duplicates in used ids"""
     new_set = set(data)
     return list(new_set)
+
+
+def store_used_ids(request, current_technology):
+    if str(current_technology) not in request.session.get("used_technologies").keys():
+        request.session.get("used_technologies")[
+            str(current_technology)
+        ] = remove_duplicates(request.session["used_ids"])
+    else:
+        stored_ids = request.session.get("used_technologies")[str(current_technology)]
+        last_ids = request.session.get("used_ids")
+        store_ids = remove_duplicates(stored_ids + last_ids)
+        request.session.get("used_technologies")[str(current_technology)] = store_ids

@@ -18,7 +18,7 @@ from quiz.utils import (
     save_results,
     calculate_percentage,
     calculate_if_higher_seniority,
-    remove_duplicates,
+    store_used_ids,
 )
 from quiz.serializers import QuizSerializer
 
@@ -136,34 +136,22 @@ class QuestionView(View):
             correct_answers_ids.sort()
             if data == correct_answers_ids:
                 update_score(request)
-        request.session["num_in_series"] -= 1
-        request.session["current_num_of_questions"] -= 1
-        if request.session["num_in_series"] <= 0:  # single serie of question ends
+        if (
+            len(request.session["used_ids"]) % int(request.session["num_in_series"])
+            == 0
+        ):  # single serie of question ends
             current_seniority = request.session.get("seniority_level")
             current_technology = request.session.get("current_technology")
-            if (
-                str(current_technology)
-                not in request.session.get("used_technologies").keys()
-            ):
-                request.session.get("used_technologies")[
-                    str(current_technology)
-                ] = remove_duplicates(request.session["used_ids"])
-            else:
-                stored_ids = request.session.get("used_technologies")[
-                    str(current_technology)
-                ]
-                last_ids = request.session.get("used_ids")
-                store_ids = remove_duplicates(stored_ids + last_ids)
-                request.session.get("used_technologies")[
-                    str(current_technology)
-                ] = store_ids
-            request.session.get("finished_series")[str(current_seniority)] += 1
+            store_used_ids(request, current_technology)
+            current_seniority_finished_series = (
+                request.session["finished_series"][str(current_seniority)] + 1
+            )
+            request.session["finished_series"][
+                str(current_seniority)
+            ] = current_seniority_finished_series
             results = calculate_score_for_serie(request)
             save_results(results, quiz_pk)
             seniority_change_flag = calculate_if_higher_seniority(request, results)
-            current_seniority_finished_series = request.session.get("finished_series")[
-                str(current_seniority)
-            ]
             higher_seniority_finished_series = (
                 request.session.get("finished_series")[str(current_seniority + 1)]
                 if current_seniority != MAX_SENIORITY_LEVEL
@@ -175,20 +163,22 @@ class QuestionView(View):
                 and current_seniority_finished_series == 1
                 and higher_seniority_finished_series == 0
             ):
-                request.session["seniority_level"] += 1
+                request.session["seniority_level"] = current_seniority + 1
                 request.session["used_ids"] = request.session.get("used_technologies")[
                     str(current_technology)
                 ]
             if (
                 not seniority_change_flag and current_seniority != 1
             ):  # Downgrade seniority
-                request.session["seniority_level"] -= 1
+                request.session["seniority_level"] = current_seniority - 1
                 request.session["used_ids"] = request.session.get("used_technologies")[
                     str(current_technology)
                 ]
             if (  # Quiz is finished
                 request.session["seniority_level"] > MAX_SENIORITY_LEVEL
-                or request.session["current_num_of_questions"] == 0
+                or request.session["max_num_of_questions"]
+                - len(request.session["used_ids"])
+                == 0
             ):
                 return redirect(reverse("quiz:quiz-view"))
             request.session["num_in_series"] = int(
