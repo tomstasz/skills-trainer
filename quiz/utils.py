@@ -159,6 +159,7 @@ def remove_duplicates(data):
 
 
 def store_used_ids(request, current_technology):
+    """Creates dict of all used question ids with keys being technology id"""
     if str(current_technology) not in request.session.get("used_technologies").keys():
         request.session.get("used_technologies")[
             str(current_technology)
