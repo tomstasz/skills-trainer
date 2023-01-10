@@ -1,3 +1,4 @@
+import threading
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
@@ -111,6 +112,7 @@ class QuestionView(View):
             request.session["num_in_series"] = num_in_series
             request.session["max_num_of_questions"] = quiz.number_of_questions
             request.session["current_num_of_questions"] = quiz.number_of_questions
+            # preparing dict with all seniority levels and number of series finished for each of them
             request.session["finished_series"] = {1: 0, 2: 0, 3: 0}
             request.session["used_technologies"] = {}
             request.session["categories"] = [
@@ -139,19 +141,18 @@ class QuestionView(View):
         if (
             len(request.session["used_ids"]) % int(request.session["num_in_series"])
             == 0
-        ):  # single serie of question ends
+        ):  # single serie of questions ends
             current_seniority = request.session.get("seniority_level")
             current_technology = request.session.get("current_technology")
             store_used_ids(request, current_technology)
-            current_seniority_finished_series = (
-                request.session["finished_series"][str(current_seniority)] + 1
-            )
-            request.session["finished_series"][
-                str(current_seniority)
-            ] = current_seniority_finished_series
+            with threading.Lock():
+                request.session.get("finished_series")[str(current_seniority)] += 1
             results = calculate_score_for_serie(request)
             save_results(results, quiz_pk)
             seniority_change_flag = calculate_if_higher_seniority(request, results)
+            current_seniority_finished_series = request.session.get("finished_series")[
+                str(current_seniority)
+            ]
             higher_seniority_finished_series = (
                 request.session.get("finished_series")[str(current_seniority + 1)]
                 if current_seniority != MAX_SENIORITY_LEVEL
@@ -163,14 +164,16 @@ class QuestionView(View):
                 and current_seniority_finished_series == 1
                 and higher_seniority_finished_series == 0
             ):
-                request.session["seniority_level"] = current_seniority + 1
+                with threading.Lock():
+                    request.session["seniority_level"] += 1
                 request.session["used_ids"] = request.session.get("used_technologies")[
                     str(current_technology)
                 ]
             if (
                 not seniority_change_flag and current_seniority != 1
             ):  # Downgrade seniority
-                request.session["seniority_level"] = current_seniority - 1
+                with threading.Lock():
+                    request.session["seniority_level"] -= 1
                 request.session["used_ids"] = request.session.get("used_technologies")[
                     str(current_technology)
                 ]
