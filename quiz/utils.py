@@ -34,6 +34,8 @@ def del_session_keys(request):
         del request.session["regular_score"]
     if request.session.get("senior_score") is not None:
         del request.session["senior_score"]
+    if request.session.get("starting_seniority_level") is not None:
+        del request.session["starting_seniority_level"]
     if request.session.get("seniority_level") is not None:
         del request.session["seniority_level"]
     if request.session.get("used_ids") is not None:
@@ -54,6 +56,8 @@ def del_session_keys(request):
         del request.session["technologies"]
     if request.session.get("current_technology") is not None:
         del request.session["current_technology"]
+    if request.session.get("previous_technology") is not None:
+        del request.session["previous_technology"]
     # if request.session.get("django_timezone") is not None:
     #     del request.session["django_timezone"]
     print("Session clear")
@@ -169,3 +173,17 @@ def store_used_ids(request, current_technology):
         last_ids = request.session.get("used_ids")
         store_ids = remove_duplicates(stored_ids + last_ids)
         request.session.get("used_technologies")[str(current_technology)] = store_ids
+
+
+def check_current_pk(request, pk):
+    used_ids = request.session["used_ids"]
+    used_technologies = request.session.get("used_technologies")
+    current_technology = request.session.get("current_technology")
+    previous_technology = request.session.get("previous_technology")
+    found_pk = False
+    if used_technologies is not None and previous_technology is not None:
+        if pk in used_technologies[str(previous_technology)]:
+            found_pk = True
+    if not found_pk and pk not in used_ids:
+        used_ids.append(pk)
+    request.session["used_ids"] = used_ids

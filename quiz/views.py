@@ -20,6 +20,7 @@ from quiz.utils import (
     calculate_percentage,
     calculate_if_higher_seniority,
     store_used_ids,
+    check_current_pk,
 )
 from quiz.serializers import QuizSerializer
 
@@ -86,13 +87,11 @@ class QuestionView(View):
             request.session["junior_score"] = 0
             request.session["regular_score"] = 0
             request.session["senior_score"] = 0
+            request.session["starting_seniority_level"] = question.seniority
             request.session["seniority_level"] = question.seniority
         if request.session.get("used_ids") is None:
             request.session["used_ids"] = list()
-        used_ids = request.session["used_ids"]
-        if pk not in used_ids:
-            used_ids.append(pk)
-        request.session["used_ids"] = used_ids
+        check_current_pk(request, pk)
         ctx = {}
         answers = question.get_answers()
         ctx["question"] = question
@@ -177,13 +176,23 @@ class QuestionView(View):
                 request.session["used_ids"] = request.session.get("used_technologies")[
                     str(current_technology)
                 ]
-            if (  # Quiz is finished
-                request.session["seniority_level"] > MAX_SENIORITY_LEVEL
-                or request.session["max_num_of_questions"]
+            if (  # Technology is finished
+                request.session["max_num_of_questions"]
                 - len(request.session["used_ids"])
-                == 0
+                <= 0
             ):
-                return redirect(reverse("quiz:quiz-view"))
+                request.session["previous_technology"] = current_technology
+                request.session["technologies"].remove(current_technology)
+                if len(request.session["technologies"]) == 0:  #  Quiz is finished
+                    return redirect(reverse("quiz:quiz-view"))
+                else:
+                    request.session["current_technology"] = request.session[
+                        "technologies"
+                    ][0]  # We take next technology in list and make it current
+                    request.session["seniority_level"] = request.session[
+                        "starting_seniority_level"
+                    ]
+                    request.session["used_ids"] = list()
             request.session["num_in_series"] = int(
                 request.session["max_num_of_questions"] / MAX_SENIORITY_LEVEL
             )
