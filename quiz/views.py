@@ -8,7 +8,7 @@ from django.utils.translation import activate
 from django.utils.html import strip_tags
 from rest_framework import viewsets
 
-from quiz.models import Question, Quiz, SENIORITY_CHOICES
+from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology
 from quiz.forms import QuizForm, UserEmailForm
 from quiz.utils import (
     template_choice,
@@ -20,7 +20,8 @@ from quiz.utils import (
     calculate_percentage,
     calculate_if_higher_seniority,
     store_used_ids,
-    check_current_pk,
+    check_if_current_pk_used,
+    prepare_session_scores,
 )
 from quiz.serializers import QuizSerializer
 
@@ -66,6 +67,8 @@ class QuizView(View):
             )
             quiz.category.set(category)
             quiz.technology.set(technology)
+            for tech in quiz.technology.all():
+                Score.objects.create(technology=tech, quiz=quiz)
             first_question = Question.objects.filter(
                 category__in=category, technology__in=technology, seniority=seniority
             ).first()
@@ -83,15 +86,12 @@ class QuestionView(View):
     def get(self, request, pk):
         question = get_object_or_404(Question, pk=pk)
         if request.session.get("general_score") is None:
-            request.session["general_score"] = 0
-            request.session["junior_score"] = 0
-            request.session["regular_score"] = 0
-            request.session["senior_score"] = 0
+            prepare_session_scores(request)
             request.session["starting_seniority_level"] = question.seniority
             request.session["seniority_level"] = question.seniority
         if request.session.get("used_ids") is None:
             request.session["used_ids"] = list()
-        check_current_pk(request, pk)
+        check_if_current_pk_used(request, pk)
         ctx = {}
         answers = question.get_answers()
         ctx["question"] = question
@@ -111,8 +111,6 @@ class QuestionView(View):
             request.session["num_in_series"] = num_in_series
             request.session["max_num_of_questions"] = quiz.number_of_questions
             request.session["current_num_of_questions"] = quiz.number_of_questions
-            # preparing dict with all seniority levels and number of series finished for each of them
-            request.session["finished_series"] = {1: 0, 2: 0, 3: 0}
             request.session["used_technologies"] = {}
             request.session["categories"] = [
                 category.id for category in quiz.category.all()
@@ -147,7 +145,7 @@ class QuestionView(View):
             with threading.Lock():
                 request.session.get("finished_series")[str(current_seniority)] += 1
             results = calculate_score_for_serie(request)
-            save_results(results, quiz_pk)
+            save_results(results, quiz_pk, current_technology)
             seniority_change_flag = calculate_if_higher_seniority(request, results)
             current_seniority_finished_series = request.session.get("finished_series")[
                 str(current_seniority)
@@ -188,11 +186,14 @@ class QuestionView(View):
                 else:
                     request.session["current_technology"] = request.session[
                         "technologies"
-                    ][0]  # We take next technology in list and make it current
+                    ][
+                        0
+                    ]  # We take next technology in list and make it current
                     request.session["seniority_level"] = request.session[
                         "starting_seniority_level"
                     ]
                     request.session["used_ids"] = list()
+                    prepare_session_scores(request)
             request.session["num_in_series"] = int(
                 request.session["max_num_of_questions"] / MAX_SENIORITY_LEVEL
             )
@@ -221,9 +222,10 @@ class ResultFormView(View):
 
     def post(self, request):
         form = UserEmailForm()
+        ctx = {}
         if "email" in request.POST:
             quiz = Quiz.objects.filter(email=request.POST["email"]).first()
-            ctx = calculate_percentage(request, quiz)
+            ctx["results"] = calculate_percentage(request, quiz)
             ctx["quiz"] = quiz
         ctx["quiz_form"] = form
         for k, v in SENIORITY_CHOICES:

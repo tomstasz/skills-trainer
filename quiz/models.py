@@ -42,20 +42,13 @@ class Quiz(models.Model):
     number_of_questions = models.IntegerField(
         _("Number of questions"), choices=NUM_OF_QUESTIONS
     )
-    general_score = models.IntegerField(default=0)
-    junior_score = models.IntegerField(default=0)
-    number_of_junior_series = models.IntegerField(default=0)
-    regular_score = models.IntegerField(default=0)
-    number_of_regular_series = models.IntegerField(default=0)
-    senior_score = models.IntegerField(default=0)
-    number_of_senior_series = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "quizes"
 
     def __str__(self):
-        return f"{self.technology} - {self.user_name}"
+        return f"{self.user_name} - {self.email}"
 
 
 class Question(models.Model):
@@ -116,3 +109,18 @@ class Technology(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Score(models.Model):
+    quiz = models.ForeignKey("Quiz", on_delete=models.CASCADE)
+    technology = models.ForeignKey("Technology", on_delete=models.PROTECT)
+    general_score = models.IntegerField(default=0)
+    junior_score = models.IntegerField(default=0)
+    number_of_junior_series = models.IntegerField(default=0)
+    regular_score = models.IntegerField(default=0)
+    number_of_regular_series = models.IntegerField(default=0)
+    senior_score = models.IntegerField(default=0)
+    number_of_senior_series = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.technology} - {self.quiz}"

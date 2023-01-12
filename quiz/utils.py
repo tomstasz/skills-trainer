@@ -1,6 +1,6 @@
 import random
 
-from quiz.models import Question, Quiz, SENIORITY_CHOICES
+from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology
 
 
 def template_choice(question_type):
@@ -93,36 +93,46 @@ def calculate_score_for_serie(request):
     return scores
 
 
-def save_results(results, quiz_pk):
-    quiz = Quiz.objects.get(pk=quiz_pk)
+def save_results(results, quiz_pk, current_technology):
+    score = Score.objects.filter(
+        quiz__pk=quiz_pk, technology__pk=current_technology
+    ).first()
     for key, value in results.items():
-        vars(quiz)[key] = value
-    quiz.save()
+        vars(score)[key] = value
+    score.save()
 
 
 def calculate_percentage(request, quiz):
     """Calculate percentage of correct answers
     taking into account number of finished series
-    from each seniority level"""
+    from each seniority level in each technology"""
+
     single_serie_length = quiz.number_of_questions / len(SENIORITY_CHOICES)
-    num_of_finished_series = {
-        "1": quiz.number_of_junior_series,
-        "2": quiz.number_of_regular_series,
-        "3": quiz.number_of_senior_series,
-    }
     general_multiplayer = 100 / quiz.number_of_questions
     seniority = quiz.seniority
     ctx = {}
-    for k, v in SENIORITY_CHOICES:
-        multiplayer = calculate_multiplayer(
-            k, num_of_finished_series, single_serie_length
+    scores = quiz.score_set.all()
+    for score in scores:
+        tech_result = {}
+        num_of_finished_series = {
+            "1": score.number_of_junior_series,
+            "2": score.number_of_regular_series,
+            "3": score.number_of_senior_series,
+        }
+        for k, v in SENIORITY_CHOICES:
+            multiplayer = calculate_multiplayer(
+                k, num_of_finished_series, single_serie_length
+            )
+            # vars allows direct operations on object fields values
+            serie_score = round(vars(score)[f"{v}_score"] * multiplayer, 1)
+            num_of_questions = int(single_serie_length * num_of_finished_series[str(k)])
+            if serie_score or num_of_questions:
+                tech_result[f"{v}_score"] = serie_score
+                tech_result[f"{v}_questions"] = num_of_questions
+        tech_result["general_score"] = round(
+            score.general_score * general_multiplayer, 1
         )
-        # vars allows direct operations on object fields values
-        ctx[f"{v}_score"] = round(vars(quiz)[f"{v}_score"] * multiplayer, 1)
-        ctx[f"{v}_questions"] = int(
-            single_serie_length * num_of_finished_series[str(k)]
-        )
-    ctx["general_score"] = round(quiz.general_score * general_multiplayer, 1)
+        ctx[score.technology.name] = tech_result
     return ctx
 
 
@@ -175,7 +185,7 @@ def store_used_ids(request, current_technology):
         request.session.get("used_technologies")[str(current_technology)] = store_ids
 
 
-def check_current_pk(request, pk):
+def check_if_current_pk_used(request, pk):
     used_ids = request.session["used_ids"]
     used_technologies = request.session.get("used_technologies")
     current_technology = request.session.get("current_technology")
@@ -187,3 +197,12 @@ def check_current_pk(request, pk):
     if not found_pk and pk not in used_ids:
         used_ids.append(pk)
     request.session["used_ids"] = used_ids
+
+
+def prepare_session_scores(request):
+    request.session["general_score"] = 0
+    request.session["junior_score"] = 0
+    request.session["regular_score"] = 0
+    request.session["senior_score"] = 0
+    # preparing dict with all seniority levels and number of series finished for each of them
+    request.session["finished_series"] = {1: 0, 2: 0, 3: 0}

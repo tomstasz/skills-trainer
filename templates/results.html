@@ -17,24 +17,35 @@
 <div id="percent-div">
     <h4>{% translate "User:" %} {{ quiz.user_name }}</h4>
     <p>{% translate "Initial level:" %} {{ seniority }}</p>
+    <p>{% translate "Number of questions per technology:" %} {{ quiz.number_of_questions }}</p>
     <br>
-    {% if junior_score is not None and junior_questions > 0  %}
-        <p><b>{% translate "Junior Score:" %} </b><span style="color:red;">{{ junior_score }}%</span></p>
-        <p>{% translate "Number of questions:" %} {{ junior_questions }}</p>
-    {% endif %}
-    <br>
-    {% if regular_score is not None and regular_questions > 0 %}
-        <p><b>{% translate "Regular Score:" %} </b><span style="color:red;">{{ regular_score }}%</span></p>
-        <p>{% translate "Number of questions:" %} {{ regular_questions }}</p>
-    {% endif %}
-    <br>
-    {% if senior_score is not None and senior_questions > 0 %}
-        <p><b>{% translate "Senior Score:" %} </b><span style="color:red;">{{ senior_score }}%</span></p>
-        <p>{% translate "Number of questions:" %} {{ senior_questions }}</p>
-    {% endif %}
-    <br>
-    <p><b>{% translate "General Score:" %} </b><span style="color:red;">{{ general_score }}%</span></p>
-    <p>{% translate "Number of questions:" %} {{ quiz.number_of_questions }}</p>
+    {% for technology, scores in results.items %}
+        <h3>{{ technology}}</h3>
+            {% for k, v in scores.items %}
+                {% if k == "junior_score" %}
+                    <p><b>{% translate "Junior Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
+                {% endif %}
+                {% if k == "junior_questions" %}
+                    <p>{% translate "Number of junior questions:" %} {{ v }}</p>
+                {% endif %}
+                {% if k == "regular_score" %}
+                    <p><b>{% translate "Regular Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
+                {% endif %}
+                {% if k == "regular_questions" %}
+                    <p>{% translate "Number of regular questions:" %} {{ v }}</p>
+                {% endif %}
+                {% if k == "senior_score" %}
+                    <p><b>{% translate "Senior Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
+                {% endif %}
+                {% if k == "senior_questions" %}
+                    <p>{% translate "Number of senior questions:" %} {{ v }}</p>
+                {% endif %}
+                {% if k == "general_score" %}
+                    <p><b>{% translate "General Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
+                {% endif %}
+            {% endfor %}
+            <br>
+    {% endfor %}
 </div>
 {% endif %}
 {% endblock content %}
