@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-05 16:33+0100\n"
+"POT-Creation-Date: 2023-01-13 12:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,14 +19,6 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
 "(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
 "n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-
-#: prog_level_test/settings.py:122
-msgid "English"
-msgstr ""
-
-#: prog_level_test/settings.py:123
-msgid "Polish"
-msgstr ""
 
 #: quiz/models.py:35
 msgid "category"
@@ -47,6 +39,14 @@ msgstr "Nazwa użytkownika"
 #: quiz/models.py:43
 msgid "Number of questions"
 msgstr "Liczba pytań"
+
+#: skillstrainer/settings.py:122
+msgid "English"
+msgstr ""
+
+#: skillstrainer/settings.py:123
+msgid "Polish"
+msgstr ""
 
 #: templates/boolean_question.html:28
 msgid "True"
@@ -85,24 +85,35 @@ msgstr "Użytkownik:"
 msgid "Initial level:"
 msgstr "Poziom startowy:"
 
-#: templates/results.html:22
+#: templates/results.html:20
+msgid "Number of questions per technology:"
+msgstr "Liczba pytań dla każdej technologii:"
+
+#: templates/results.html:26
 msgid "Junior Score:"
 msgstr "Poziom junior:"
 
-#: templates/results.html:23 templates/results.html:28
-#: templates/results.html:33 templates/results.html:37
-msgid "Number of questions:"
-msgstr "Liczba pytań:"
+#: templates/results.html:29
+msgid "Number of junior questions:"
+msgstr "Liczba pytań juniorskich:"
 
-#: templates/results.html:27
+#: templates/results.html:32
 msgid "Regular Score:"
 msgstr "Poziom regular:"
 
-#: templates/results.html:32
+#: templates/results.html:35
+msgid "Number of regular questions:"
+msgstr "Liczba pytań regular:"
+
+#: templates/results.html:38
 msgid "Senior Score:"
 msgstr "Poziom senior:"
 
-#: templates/results.html:36
+#: templates/results.html:41
+msgid "Number of senior questions:"
+msgstr "Liczba pytań seniorskich:"
+
+#: templates/results.html:44
 msgid "General Score:"
 msgstr "Wynik całościowy:"
 

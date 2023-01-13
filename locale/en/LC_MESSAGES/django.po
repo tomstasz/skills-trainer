@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-05 16:33+0100\n"
+"POT-Creation-Date: 2023-01-13 12:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: prog_level_test/settings.py:122
-msgid "English"
-msgstr ""
-
-#: prog_level_test/settings.py:123
-msgid "Polish"
-msgstr ""
 
 #: quiz/models.py:35
 msgid "category"
@@ -44,6 +36,14 @@ msgstr ""
 
 #: quiz/models.py:43
 msgid "Number of questions"
+msgstr ""
+
+#: skillstrainer/settings.py:122
+msgid "English"
+msgstr ""
+
+#: skillstrainer/settings.py:123
+msgid "Polish"
 msgstr ""
 
 #: templates/boolean_question.html:28
@@ -83,24 +83,35 @@ msgstr ""
 msgid "Initial level:"
 msgstr ""
 
-#: templates/results.html:22
+#: templates/results.html:20
+msgid "Number of questions per technology:"
+msgstr ""
+
+#: templates/results.html:26
 msgid "Junior Score:"
 msgstr ""
 
-#: templates/results.html:23 templates/results.html:28
-#: templates/results.html:33 templates/results.html:37
-msgid "Number of questions:"
-msgstr ""
-
-#: templates/results.html:27
-msgid "Regular Score:"
+#: templates/results.html:29
+msgid "Number of junior questions:"
 msgstr ""
 
 #: templates/results.html:32
+msgid "Regular Score:"
+msgstr ""
+
+#: templates/results.html:35
+msgid "Number of regular questions:"
+msgstr ""
+
+#: templates/results.html:38
 msgid "Senior Score:"
 msgstr ""
 
-#: templates/results.html:36
+#: templates/results.html:41
+msgid "Number of senior questions:"
+msgstr ""
+
+#: templates/results.html:44
 msgid "General Score:"
 msgstr ""
 

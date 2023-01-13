@@ -38,7 +38,7 @@ class TechnologyAdmin(admin.ModelAdmin):
 
 
 class ScoreAdmin(admin.ModelAdmin):
-    list_display = ("id",)
+    list_display = ("id", "technology", "quiz")
     readonly_fields = (
         "technology",
         "junior_score",

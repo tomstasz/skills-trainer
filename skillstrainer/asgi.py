@@ -1,5 +1,5 @@
 """
-ASGI config for prog_level_test project.
+ASGI config for skillstrainer project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prog_level_test.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "skillstrainer.settings")
 
 application = get_asgi_application()
