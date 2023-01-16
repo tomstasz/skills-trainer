@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from quiz.models import Quiz
+from quiz.models import Quiz, Technology
 
 
 class QuizForm(forms.ModelForm):
@@ -21,10 +21,9 @@ class QuizForm(forms.ModelForm):
     field_order = [
         "user_name",
         "email",
+        "number_of_questions",
         "category",
         "technology",
-        "seniority",
-        "number_of_questions",
     ]
 
 

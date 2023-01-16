@@ -8,7 +8,7 @@ from django.utils.translation import activate
 from django.utils.html import strip_tags
 from rest_framework import viewsets
 
-from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology
+from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology, Seniority
 from quiz.forms import QuizForm, UserEmailForm
 from quiz.utils import (
     template_choice,
@@ -39,7 +39,7 @@ class QuizView(View):
         form = QuizForm()
         del_session_keys(request)
         return render(
-            request, "index.html", {"quiz_form": form, "timezones": TIMEZONES}
+            request, "index.html", {"quiz_form": form, "timezones": TIMEZONES, "seniority_levels": SENIORITY_CHOICES}
         )
 
     def post(self, request):
@@ -51,16 +51,15 @@ class QuizView(View):
         ):
             request.session["django_timezone"] = request.POST["timezone"]
             return redirect("/")
+        selected_technologies = list()
         form = QuizForm(request.POST)
         if form.is_valid():
             category = form.cleaned_data["category"]
             technology = form.cleaned_data["technology"]
-            seniority = form.cleaned_data["seniority"]
             user_name = form.cleaned_data["user_name"]
             email = form.cleaned_data["email"]
             number_of_questions = form.cleaned_data["number_of_questions"]
             quiz = Quiz.objects.create(
-                seniority=seniority,
                 user_name=user_name,
                 email=email,
                 number_of_questions=number_of_questions,
@@ -69,13 +68,30 @@ class QuizView(View):
             quiz.technology.set(technology)
             for tech in quiz.technology.all():
                 Score.objects.create(technology=tech, quiz=quiz)
-            first_question = Question.objects.filter(
-                category__in=category, technology__in=technology, seniority=seniority
-            ).first()
-            if first_question is None:
-                raise Http404("Question not found.")
-            ctx["first_question_pk"] = first_question.pk
-            ctx["quiz_pk"] = quiz.pk
+                selected_technologies.append(tech.name)
+            ctx["selected_technologies"] = selected_technologies
+            ctx["seniority_levels"] = SENIORITY_CHOICES
+            # first_question = Question.objects.filter(
+            #     category__in=category, technology__in=technology, seniority=seniority
+            # ).first()
+            # if first_question is None:
+            #     raise Http404("Question not found.")
+            # ctx["first_question_pk"] = first_question.pk
+            request.session["quiz_pk"] = quiz.pk
+            request.session["selected_technologies"] = selected_technologies
+        if "tech-submit" in request.POST and all([i in request.POST.keys() for i in request.session["selected_technologies"]]):
+            quiz = Quiz.objects.get(pk=request.session.get("quiz_pk"))
+            for technology in quiz.technology.all():
+                if request.POST.get(technology.name):
+                    seniority = Seniority.objects.get(level=request.POST[technology.name])
+                    technology.seniority = seniority
+                    technology.save()
+            quiz.save()
+            quiz = Quiz.objects.get(pk=request.session.get("quiz_pk"))
+            if request.session.get("quiz_pk") is not None:
+                del request.session["quiz_pk"]
+            if request.session.get("selected_technologies") is not None:
+                del request.session["selected_technologies"]
         form = QuizForm()
         ctx["quiz_form"] = form
         ctx["timezones"] = TIMEZONES

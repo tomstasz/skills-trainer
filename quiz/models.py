@@ -34,9 +34,6 @@ LANGUAGE_CHOICES = (
 class Quiz(models.Model):
     category = models.ManyToManyField("Category", verbose_name=_("category"))
     technology = models.ManyToManyField("Technology", verbose_name=_("technology"))
-    seniority = models.IntegerField(
-        choices=SENIORITY_CHOICES, verbose_name=_("Seniority")
-    )
     user_name = models.CharField(_("User Name"), max_length=120)
     email = models.CharField(max_length=120, unique=True)
     number_of_questions = models.IntegerField(
@@ -56,7 +53,7 @@ class Question(models.Model):
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
     technology = models.ForeignKey("Technology", on_delete=models.CASCADE)
-    seniority = models.IntegerField(choices=SENIORITY_CHOICES, db_index=True)
+    seniority = models.ForeignKey("Seniority", on_delete=models.PROTECT)
     author = models.ForeignKey(
         "Author", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -103,6 +100,7 @@ class Category(models.Model):
 
 class Technology(models.Model):
     name = models.CharField(max_length=128)
+    seniority = models.ForeignKey("Seniority", on_delete=models.PROTECT)
 
     class Meta:
         verbose_name_plural = "technologies"
@@ -124,3 +122,15 @@ class Score(models.Model):
 
     def __str__(self):
         return f"{self.technology} - {self.quiz}"
+
+
+class Seniority(models.Model):
+    level = models.IntegerField(
+        choices=SENIORITY_CHOICES, verbose_name=_("Seniority")
+    )
+
+    class Meta:
+        verbose_name_plural = "seniority"
+
+    def __str__(self):
+        return f"{self.level}"
