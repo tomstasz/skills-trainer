@@ -100,7 +100,6 @@ class Category(models.Model):
 
 class Technology(models.Model):
     name = models.CharField(max_length=128)
-    seniority = models.ForeignKey("Seniority", on_delete=models.PROTECT)
 
     class Meta:
         verbose_name_plural = "technologies"
@@ -112,6 +111,9 @@ class Technology(models.Model):
 class Score(models.Model):
     quiz = models.ForeignKey("Quiz", on_delete=models.CASCADE)
     technology = models.ForeignKey("Technology", on_delete=models.PROTECT)
+    seniority = models.ForeignKey(
+        "Seniority", on_delete=models.PROTECT, null=True, blank=True
+    )
     general_score = models.IntegerField(default=0)
     junior_score = models.IntegerField(default=0)
     number_of_junior_series = models.IntegerField(default=0)
@@ -125,9 +127,7 @@ class Score(models.Model):
 
 
 class Seniority(models.Model):
-    level = models.IntegerField(
-        choices=SENIORITY_CHOICES, verbose_name=_("Seniority")
-    )
+    level = models.IntegerField(choices=SENIORITY_CHOICES, verbose_name=_("Seniority"))
 
     class Meta:
         verbose_name_plural = "seniority"

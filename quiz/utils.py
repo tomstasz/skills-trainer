@@ -63,7 +63,7 @@ def del_session_keys(request):
     print("Session clear")
 
 
-def draw_questions(seniority_level, categories, technology, used_ids):
+def draw_questions(seniority_level, categories, technology, used_ids=[]):
     ids = list(
         Question.objects.filter(
             seniority=seniority_level, category__in=categories, technology=technology
@@ -109,7 +109,6 @@ def calculate_percentage(request, quiz):
 
     single_serie_length = quiz.number_of_questions / len(SENIORITY_CHOICES)
     general_multiplayer = 100 / quiz.number_of_questions
-    seniority = quiz.seniority
     ctx = {}
     scores = quiz.score_set.all()
     for score in scores:
@@ -126,9 +125,11 @@ def calculate_percentage(request, quiz):
             # vars allows direct operations on object fields values
             serie_score = round(vars(score)[f"{v}_score"] * multiplayer, 1)
             num_of_questions = int(single_serie_length * num_of_finished_series[str(k)])
+            # We make sure to pass only series in which user participated
             if serie_score or num_of_questions:
                 tech_result[f"{v}_score"] = serie_score
                 tech_result[f"{v}_questions"] = num_of_questions
+                tech_result["seniority"] = score.seniority.level
         tech_result["general_score"] = round(
             score.general_score * general_multiplayer, 1
         )

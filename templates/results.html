@@ -16,11 +16,11 @@
 {% if quiz %}
 <div id="percent-div">
     <h4>{% translate "User:" %} {{ quiz.user_name }}</h4>
-    <p>{% translate "Initial level:" %} {{ seniority }}</p>
     <p>{% translate "Number of questions per technology:" %} {{ quiz.number_of_questions }}</p>
     <br>
     {% for technology, scores in results.items %}
         <h3>{{ technology}}</h3>
+        <p>{% translate "Initial level:" %} {{ scores.seniority }}</p>
             {% for k, v in scores.items %}
                 {% if k == "junior_score" %}
                     <p><b>{% translate "Junior Score:" %} </b><span style="color:red;">{{ v }}%</span></p>

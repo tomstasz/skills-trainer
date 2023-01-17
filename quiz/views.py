@@ -1,4 +1,6 @@
+import random
 import threading
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
@@ -39,7 +41,13 @@ class QuizView(View):
         form = QuizForm()
         del_session_keys(request)
         return render(
-            request, "index.html", {"quiz_form": form, "timezones": TIMEZONES, "seniority_levels": SENIORITY_CHOICES}
+            request,
+            "index.html",
+            {
+                "quiz_form": form,
+                "timezones": TIMEZONES,
+                "seniority_levels": SENIORITY_CHOICES,
+            },
         )
 
     def post(self, request):
@@ -71,23 +79,35 @@ class QuizView(View):
                 selected_technologies.append(tech.name)
             ctx["selected_technologies"] = selected_technologies
             ctx["seniority_levels"] = SENIORITY_CHOICES
-            # first_question = Question.objects.filter(
-            #     category__in=category, technology__in=technology, seniority=seniority
-            # ).first()
-            # if first_question is None:
-            #     raise Http404("Question not found.")
-            # ctx["first_question_pk"] = first_question.pk
             request.session["quiz_pk"] = quiz.pk
             request.session["selected_technologies"] = selected_technologies
-        if "tech-submit" in request.POST and all([i in request.POST.keys() for i in request.session["selected_technologies"]]):
+        if "tech-submit" in request.POST and all(
+            [i in request.POST.keys() for i in request.session["selected_technologies"]]
+        ):
             quiz = Quiz.objects.get(pk=request.session.get("quiz_pk"))
             for technology in quiz.technology.all():
                 if request.POST.get(technology.name):
-                    seniority = Seniority.objects.get(level=request.POST[technology.name])
-                    technology.seniority = seniority
-                    technology.save()
-            quiz.save()
-            quiz = Quiz.objects.get(pk=request.session.get("quiz_pk"))
+                    score = Score.objects.filter(
+                        quiz__pk=quiz.pk, technology__pk=technology.pk
+                    ).first()
+                    seniority = Seniority.objects.get(
+                        level=request.POST[technology.name]
+                    )
+                    score.seniority = seniority
+                    score.save()
+            first_question_technology = random.choice(list(quiz.technology.all()))
+            first_question_seniority = quiz.score_set.get(
+                technology=first_question_technology.pk
+            ).seniority.level
+            first_question_pk = draw_questions(
+                first_question_seniority,
+                list(quiz.category.all()),
+                first_question_technology.pk,
+            )
+            if not first_question_pk:
+                raise Http404("Question not found.")
+            ctx["first_question_pk"] = first_question_pk
+            ctx["quiz_pk"] = quiz.pk
             if request.session.get("quiz_pk") is not None:
                 del request.session["quiz_pk"]
             if request.session.get("selected_technologies") is not None:
@@ -103,8 +123,7 @@ class QuestionView(View):
         question = get_object_or_404(Question, pk=pk)
         if request.session.get("general_score") is None:
             prepare_session_scores(request)
-            request.session["starting_seniority_level"] = question.seniority
-            request.session["seniority_level"] = question.seniority
+            request.session["seniority_level"] = question.seniority.level
         if request.session.get("used_ids") is None:
             request.session["used_ids"] = list()
         check_if_current_pk_used(request, pk)
@@ -200,14 +219,14 @@ class QuestionView(View):
                 if len(request.session["technologies"]) == 0:  #  Quiz is finished
                     return redirect(reverse("quiz:quiz-view"))
                 else:
-                    request.session["current_technology"] = request.session[
-                        "technologies"
-                    ][
+                    next_tech_in_list = request.session["technologies"][
                         0
                     ]  # We take next technology in list and make it current
-                    request.session["seniority_level"] = request.session[
-                        "starting_seniority_level"
-                    ]
+                    request.session["current_technology"] = next_tech_in_list
+                    score = Score.objects.filter(
+                        quiz__pk=quiz_pk, technology__pk=next_tech_in_list
+                    ).first()
+                    request.session["seniority_level"] = score.seniority.level
                     request.session["used_ids"] = list()
                     prepare_session_scores(request)
             request.session["num_in_series"] = int(
@@ -244,7 +263,4 @@ class ResultFormView(View):
             ctx["results"] = calculate_percentage(request, quiz)
             ctx["quiz"] = quiz
         ctx["quiz_form"] = form
-        for k, v in SENIORITY_CHOICES:
-            if k == quiz.seniority:
-                ctx["seniority"] = v
         return render(request, "results.html", ctx)
