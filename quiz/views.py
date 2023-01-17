@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
 from django.urls import reverse
 from django.views import View
-from django.utils.translation import activate
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import strip_tags
 from rest_framework import viewsets
 
@@ -16,6 +16,7 @@ from quiz.utils import (
     template_choice,
     update_score,
     del_session_keys,
+    del_quiz_session_data,
     draw_questions,
     calculate_score_for_serie,
     save_results,
@@ -29,8 +30,8 @@ from quiz.serializers import QuizSerializer
 
 TIMEZONES = {
     "----": "",
-    "Warsaw": "Europe/Warsaw",
-    "New York": "America/New_York",
+    _("Warsaw"): "Europe/Warsaw",
+    _("New York"): "America/New_York",
 }
 
 MAX_SENIORITY_LEVEL = len(SENIORITY_CHOICES)
@@ -81,10 +82,16 @@ class QuizView(View):
             ctx["seniority_levels"] = SENIORITY_CHOICES
             request.session["quiz_pk"] = quiz.pk
             request.session["selected_technologies"] = selected_technologies
-        if "tech-submit" in request.POST and all(
-            [i in request.POST.keys() for i in request.session["selected_technologies"]]
+        if (
+            "tech-submit" in request.POST
+            and all(  # check if seniority is set for all chosen technologies
+                [
+                    i in request.POST.keys()
+                    for i in request.session["selected_technologies"]
+                ]
+            )
         ):
-            quiz = Quiz.objects.get(pk=request.session.get("quiz_pk"))
+            quiz = get_object_or_404(Quiz, pk=request.session.get("quiz_pk"))
             for technology in quiz.technology.all():
                 if request.POST.get(technology.name):
                     score = Score.objects.filter(
@@ -108,10 +115,16 @@ class QuizView(View):
                 raise Http404("Question not found.")
             ctx["first_question_pk"] = first_question_pk
             ctx["quiz_pk"] = quiz.pk
-            if request.session.get("quiz_pk") is not None:
-                del request.session["quiz_pk"]
-            if request.session.get("selected_technologies") is not None:
-                del request.session["selected_technologies"]
+            del_quiz_session_data(request)
+        elif request.POST and not "email" in request.POST:
+            ctx["message"] = _(
+                """Quiz will not be generated without setting seniority levels.
+                                Please try to fill the fields again."""
+            )
+            quiz = get_object_or_404(Quiz, pk=request.session.get("quiz_pk"))
+            quiz.delete()
+            print("Quiz DELETED")
+            del_quiz_session_data(request)
         form = QuizForm()
         ctx["quiz_form"] = form
         ctx["timezones"] = TIMEZONES

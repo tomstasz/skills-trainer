@@ -34,23 +34,11 @@
 </form>
 <br>
 {% if request.POST and selected_technologies %}
-<h3>{% translate "Please set initial seniority for each technology in quiz:" %}</h3>
-    <form id="tech-form" action="" method="post">
-    {% csrf_token %}
-    {% for technology in selected_technologies %}
-        <b>{{ technology }}: </b>
-        {% for seniority in seniority_levels %}
-            <input type="radio" name={{ technology }} value={{ seniority.0 }} /> {{ seniority.1 }}
-        {% endfor %}
-        <br>
-    {% endfor %}
-    <br>
-    <button type="submit" name="tech-submit" value="">{% translate "Generate Quiz Link" %}</button>
-    </form>
+    {% include 'seniority.html' %}
+{% elif request.POST and message %}
+    </b><span style="color:red;">{{ message }}</span></p>
 {% endif %}
-{% if message %}
-{{ message }}
-{% endif %}
+
 {% if request.POST and first_question_pk %}
 Link do testu:
     <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_pk }}?q={{ quiz_pk }}"></a>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 14:32+0100\n"
+"POT-Creation-Date: 2023-01-17 16:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,6 +40,20 @@ msgstr "Liczba pytań"
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
+#: quiz/views.py:33
+msgid "Warsaw"
+msgstr "Warszawa"
+
+#: quiz/views.py:34
+msgid "New York"
+msgstr "Nowy Jork"
+
+#: quiz/views.py:121
+msgid ""
+"Quiz will not be generated without setting seniority levels.\n"
+"                                Please try to fill the fields again."
+msgstr "Quiz nie zostanie wygenerowany bez wybrania poziomu zaawansowania dla kazdej technologii.\n"
+"                                Proszę ponownie wypełnić pola."
 #: skillstrainer/settings.py:122
 msgid "English"
 msgstr "Angielski"
@@ -72,15 +86,6 @@ msgstr "Ustaw"
 #: templates/index.html:33
 msgid "Save"
 msgstr "Zapisz"
-
-#: templates/index.html:37
-msgid "Please set initial seniority for each technology in quiz:"
-msgstr ""
-"Proszę ustawić początkowy poziom zaawansowania dla każdej technologii w quizie:"
-
-#: templates/index.html:48
-msgid "Generate Quiz Link"
-msgstr "Wygeneruj link do quizu"
 
 #: templates/results.html:13
 msgid "Find"
@@ -125,6 +130,16 @@ msgstr "Liczba pytań seniorskich:"
 #: templates/results.html:44
 msgid "General Score:"
 msgstr "Wynik całościowy:"
+
+#: templates/seniority.html:4
+msgid "Please set initial seniority for each technology in quiz:"
+msgstr ""
+"Proszę ustawić początkowy poziom zaawansowania dla każdej technologii w "
+"quizie:"
+
+#: templates/seniority.html:15
+msgid "Generate Quiz Link"
+msgstr "Wygeneruj link do quizu"
 
 #: templates/single_question_open.html:28
 msgid "Your answer:"

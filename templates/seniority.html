@@ -1,0 +1,16 @@
+{% load static %}
+{% load i18n %}
+
+<h3>{% translate "Please set initial seniority for each technology in quiz:" %}</h3>
+<form id="tech-form" action="" method="post">
+    {% csrf_token %}
+    {% for technology in selected_technologies %}
+        <b>{{ technology }}: </b>
+        {% for seniority in seniority_levels %}
+            <input type="radio" name={{ technology }} value={{ seniority.0 }} /> {{ seniority.1 }}
+        {% endfor %}
+        <br>
+    {% endfor %}
+    <br>
+    <button type="submit" name="tech-submit" value="">{% translate "Generate Quiz Link" %}</button>
+    </form>

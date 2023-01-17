@@ -34,8 +34,6 @@ def del_session_keys(request):
         del request.session["regular_score"]
     if request.session.get("senior_score") is not None:
         del request.session["senior_score"]
-    if request.session.get("starting_seniority_level") is not None:
-        del request.session["starting_seniority_level"]
     if request.session.get("seniority_level") is not None:
         del request.session["seniority_level"]
     if request.session.get("used_ids") is not None:
@@ -61,6 +59,13 @@ def del_session_keys(request):
     # if request.session.get("django_timezone") is not None:
     #     del request.session["django_timezone"]
     print("Session clear")
+
+
+def del_quiz_session_data(request):
+    if request.session.get("quiz_pk") is not None:
+        del request.session["quiz_pk"]
+    if request.session.get("selected_technologies") is not None:
+        del request.session["selected_technologies"]
 
 
 def draw_questions(seniority_level, categories, technology, used_ids=[]):
