@@ -9,7 +9,7 @@ app_name = "quiz"
 
 urlpatterns = [
     path("", QuizView.as_view(), name="quiz-view"),
-    path("<int:pk>/", QuestionView.as_view(), name="question-view"),
+    path("<uuid:uuid>/", QuestionView.as_view(), name="question-view"),
     path("", include(router.urls)),
     path("find/", ResultFormView.as_view(), name="result-view"),
 ]

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 from django.utils import timezone
@@ -49,6 +50,7 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     text = RichTextUploadingField(null=True, blank=True, config_name="special")
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     category = models.ForeignKey("Category", on_delete=models.CASCADE)

@@ -39,8 +39,8 @@
     </b><span style="color:red;">{{ message }}</span></p>
 {% endif %}
 
-{% if request.POST and first_question_pk %}
+{% if request.POST and first_question_uuid %}
 Link do testu:
-    <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_pk }}?q={{ quiz_pk }}"></a>
+    <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_uuid }}?q={{ quiz_pk }}"></a>
 {% endif %}
 {% endblock content %}

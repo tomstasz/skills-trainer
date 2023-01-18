@@ -111,9 +111,8 @@ class QuizView(View):
                 list(quiz.category.all()),
                 first_question_technology.pk,
             )
-            if not first_question_pk:
-                raise Http404("Question not found.")
-            ctx["first_question_pk"] = first_question_pk
+            first_question = get_object_or_404(Question, pk=first_question_pk)
+            ctx["first_question_uuid"] = first_question.uuid
             ctx["quiz_pk"] = quiz.pk
             del_quiz_session_data(request)
         elif request.POST and not "email" in request.POST:
@@ -132,14 +131,14 @@ class QuizView(View):
 
 
 class QuestionView(View):
-    def get(self, request, pk):
-        question = get_object_or_404(Question, pk=pk)
+    def get(self, request, uuid):
+        question = get_object_or_404(Question, uuid=uuid)
         if request.session.get("general_score") is None:
             prepare_session_scores(request)
             request.session["seniority_level"] = question.seniority.level
         if request.session.get("used_ids") is None:
             request.session["used_ids"] = list()
-        check_if_current_pk_used(request, pk)
+        check_if_current_pk_used(request, question.pk)
         ctx = {}
         answers = question.get_answers()
         ctx["question"] = question
@@ -149,12 +148,12 @@ class QuestionView(View):
         template = template_choice(question.question_type)
         return render(request, template, ctx)
 
-    def post(self, request, pk):
-        question = Question.objects.get(pk=pk)
+    def post(self, request, uuid):
+        question = get_object_or_404(Question, uuid=uuid)
         answers = question.get_answers()
         quiz_pk = request.GET.get("q")
         if request.session.get("num_in_series") is None:
-            quiz = Quiz.objects.get(pk=quiz_pk)
+            quiz = get_object_or_404(Quiz, pk=quiz_pk)
             num_in_series = int(quiz.number_of_questions / MAX_SENIORITY_LEVEL)
             request.session["num_in_series"] = num_in_series
             request.session["max_num_of_questions"] = quiz.number_of_questions
@@ -253,7 +252,7 @@ class QuestionView(View):
         )
         next_question = get_object_or_404(Question, pk=next_question_pk)
         return redirect(
-            reverse("quiz:question-view", kwargs={"pk": next_question_pk})
+            reverse("quiz:question-view", kwargs={"uuid": next_question.uuid})
             + f"?q={quiz_pk}"
         )
 

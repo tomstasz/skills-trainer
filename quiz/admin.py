@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Author, Answer, Category, Score, Technology, Quiz, Question, Seniority
+from .models import (
+    Author,
+    Answer,
+    Category,
+    Score,
+    Technology,
+    Quiz,
+    Question,
+    Seniority,
+)
 from modeltranslation.admin import TranslationAdmin
 
 
@@ -15,9 +24,9 @@ class QuizAdmin(admin.ModelAdmin):
 
 class QuestionAdmin(TranslationAdmin):
     list_display = (
-        "category",
         "technology",
-        # "seniority",
+        "category",
+        "seniority",
         "question_type",
         "text",
     )
@@ -38,7 +47,7 @@ class TechnologyAdmin(admin.ModelAdmin):
 
 
 class ScoreAdmin(admin.ModelAdmin):
-    list_display = ("id", "technology", "quiz")
+    list_display = ("technology", "quiz")
     readonly_fields = (
         "technology",
         "junior_score",
@@ -53,7 +62,6 @@ class ScoreAdmin(admin.ModelAdmin):
 
 class SeniorityAdmin(admin.ModelAdmin):
     list_display = ("id", "level")
-
 
 
 admin.site.register(Author, AuthorAdmin)
