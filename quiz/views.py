@@ -18,13 +18,11 @@ from quiz.utils import (
     del_session_keys,
     del_quiz_session_data,
     draw_questions,
-    calculate_score_for_serie,
-    save_results,
+    save_number_of_finished_series,
     calculate_percentage,
     calculate_if_higher_seniority,
-    store_used_ids,
-    check_if_current_pk_used,
-    prepare_session_scores,
+    set_initial_score_data,
+    get_question_and_score,
 )
 from quiz.serializers import QuizSerializer
 
@@ -75,8 +73,9 @@ class QuizView(View):
             )
             quiz.category.set(category)
             quiz.technology.set(technology)
-            for tech in quiz.technology.all():
-                Score.objects.create(technology=tech, quiz=quiz)
+            for tech in list(quiz.technology.all()):
+                score_data = set_initial_score_data(quiz)
+                Score.objects.create(technology=tech, quiz=quiz, score_data=score_data)
                 selected_technologies.append(tech.name)
             ctx["selected_technologies"] = selected_technologies
             ctx["seniority_levels"] = SENIORITY_CHOICES
@@ -101,6 +100,7 @@ class QuizView(View):
                         level=request.POST[technology.name]
                     )
                     score.seniority = seniority
+                    score.score_data["seniority_level"] = seniority.level
                     score.save()
             first_question_technology = random.choice(list(quiz.technology.all()))
             first_question_seniority = quiz.score_set.get(
@@ -132,13 +132,14 @@ class QuizView(View):
 
 class QuestionView(View):
     def get(self, request, uuid):
-        question = get_object_or_404(Question, uuid=uuid)
-        if request.session.get("general_score") is None:
-            prepare_session_scores(request)
-            request.session["seniority_level"] = question.seniority.level
-        if request.session.get("used_ids") is None:
-            request.session["used_ids"] = list()
-        check_if_current_pk_used(request, question.pk)
+        quiz_pk = request.GET.get("q")
+        question, score = get_question_and_score(quiz_pk, uuid)
+        if question.pk not in score.score_data["used_ids"]:
+            score.score_data["used_ids"].append(question.pk)
+            score.score_data["seniority_level"] = question.seniority.level
+        else:
+            print("USED PK")
+        score.save()
         ctx = {}
         answers = question.get_answers()
         ctx["question"] = question
@@ -149,29 +150,22 @@ class QuestionView(View):
         return render(request, template, ctx)
 
     def post(self, request, uuid):
-        question = get_object_or_404(Question, uuid=uuid)
-        answers = question.get_answers()
         quiz_pk = request.GET.get("q")
-        if request.session.get("num_in_series") is None:
-            quiz = get_object_or_404(Quiz, pk=quiz_pk)
-            num_in_series = int(quiz.number_of_questions / MAX_SENIORITY_LEVEL)
-            request.session["num_in_series"] = num_in_series
-            request.session["max_num_of_questions"] = quiz.number_of_questions
-            request.session["current_num_of_questions"] = quiz.number_of_questions
-            request.session["used_technologies"] = {}
-            request.session["categories"] = [
-                category.id for category in quiz.category.all()
+        question, score = get_question_and_score(quiz_pk, uuid)
+        answers = question.get_answers()
+        if request.session.get("current_num_of_questions") is None:
+            request.session["current_num_of_questions"] = score.score_data[
+                "max_num_of_questions"
             ]
             request.session["technologies"] = [
-                technology.id for technology in quiz.technology.all()
+                technology for technology in score.score_data["technologies"]
             ]
-            request.session["current_technology"] = question.technology.id
         # different question types check
         if question.question_type == "open" or question.question_type == "true/false":
             ans = strip_tags(answers[0].text)
             user_answer = request.POST.get("ans")
             if ans == user_answer:
-                update_score(request)
+                score = update_score(score)
         if question.question_type == "multiple choice":
             data = list(request.POST)
             data.remove("csrfmiddlewaretoken")
@@ -181,24 +175,23 @@ class QuestionView(View):
             ]
             correct_answers_ids.sort()
             if data == correct_answers_ids:
-                update_score(request)
+                score = update_score(score)
+        request.session["current_num_of_questions"] -= 1
         if (
-            len(request.session["used_ids"]) % int(request.session["num_in_series"])
-            == 0
+            len(score.score_data["used_ids"]) % score.score_data["num_in_series"] == 0
         ):  # single serie of questions ends
-            current_seniority = request.session.get("seniority_level")
-            current_technology = request.session.get("current_technology")
-            store_used_ids(request, current_technology)
-            with threading.Lock():
-                request.session.get("finished_series")[str(current_seniority)] += 1
-            results = calculate_score_for_serie(request)
-            save_results(results, quiz_pk, current_technology)
-            seniority_change_flag = calculate_if_higher_seniority(request, results)
-            current_seniority_finished_series = request.session.get("finished_series")[
+            current_seniority = score.score_data["seniority_level"]
+            current_technology = score.technology.pk
+            score.score_data["finished_series"][str(current_seniority)] += 1
+            save_number_of_finished_series(score)
+            seniority_change_flag = calculate_if_higher_seniority(
+                score, current_seniority
+            )
+            current_seniority_finished_series = score.score_data["finished_series"][
                 str(current_seniority)
             ]
             higher_seniority_finished_series = (
-                request.session.get("finished_series")[str(current_seniority + 1)]
+                score.score_data["finished_series"][str(current_seniority + 1)]
                 if current_seniority != MAX_SENIORITY_LEVEL
                 else 0
             )
@@ -208,49 +201,39 @@ class QuestionView(View):
                 and current_seniority_finished_series == 1
                 and higher_seniority_finished_series == 0
             ):
-                with threading.Lock():
-                    request.session["seniority_level"] += 1
-                request.session["used_ids"] = request.session.get("used_technologies")[
-                    str(current_technology)
-                ]
-            if (
+                score.score_data["seniority_level"] += 1
+            if (  # Downgrade seniority
                 not seniority_change_flag and current_seniority != 1
-            ):  # Downgrade seniority
-                with threading.Lock():
-                    request.session["seniority_level"] -= 1
-                request.session["used_ids"] = request.session.get("used_technologies")[
-                    str(current_technology)
-                ]
+            ):
+                score.score_data["seniority_level"] -= 1
             if (  # Technology is finished
-                request.session["max_num_of_questions"]
-                - len(request.session["used_ids"])
+                score.score_data["max_num_of_questions"]
+                - len(score.score_data["used_ids"])
                 <= 0
             ):
-                request.session["previous_technology"] = current_technology
+                score.save()
                 request.session["technologies"].remove(current_technology)
                 if len(request.session["technologies"]) == 0:  #  Quiz is finished
                     return redirect(reverse("quiz:quiz-view"))
                 else:
                     next_tech_in_list = request.session["technologies"][
                         0
-                    ]  # We take next technology in list and make it current
-                    request.session["current_technology"] = next_tech_in_list
+                    ]  # We take next technology in list
                     score = Score.objects.filter(
                         quiz__pk=quiz_pk, technology__pk=next_tech_in_list
                     ).first()
-                    request.session["seniority_level"] = score.seniority.level
-                    request.session["used_ids"] = list()
-                    prepare_session_scores(request)
-            request.session["num_in_series"] = int(
-                request.session["max_num_of_questions"] / MAX_SENIORITY_LEVEL
-            )
+                    score.score_data["seniority_level"] = score.seniority.level
+                    request.session["current_num_of_questions"] = score.score_data[
+                        "max_num_of_questions"
+                    ]
         next_question_pk = draw_questions(
-            seniority_level=request.session.get("seniority_level"),
-            categories=request.session.get("categories"),
-            technology=request.session.get("current_technology"),
-            used_ids=request.session.get("used_ids"),
+            seniority_level=score.score_data["seniority_level"],
+            categories=score.score_data["categories"],
+            technology=score.technology.pk,
+            used_ids=score.score_data["used_ids"],
         )
         next_question = get_object_or_404(Question, pk=next_question_pk)
+        score.save()
         return redirect(
             reverse("quiz:question-view", kwargs={"uuid": next_question.uuid})
             + f"?q={quiz_pk}"
@@ -272,7 +255,7 @@ class ResultFormView(View):
         ctx = {}
         if "email" in request.POST:
             quiz = Quiz.objects.filter(email=request.POST["email"]).first()
-            ctx["results"] = calculate_percentage(request, quiz)
+            ctx["results"] = calculate_percentage(quiz)
             ctx["quiz"] = quiz
         ctx["quiz_form"] = form
         return render(request, "results.html", ctx)

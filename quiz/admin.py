@@ -50,13 +50,9 @@ class ScoreAdmin(admin.ModelAdmin):
     list_display = ("technology", "quiz")
     readonly_fields = (
         "technology",
-        "junior_score",
-        "number_of_junior_series",
-        "regular_score",
-        "number_of_regular_series",
-        "senior_score",
-        "number_of_senior_series",
-        "general_score",
+        "quiz",
+        "seniority",
+        "score_data",
     )
 
 

@@ -50,7 +50,7 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     text = RichTextUploadingField(null=True, blank=True, config_name="special")
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
@@ -116,13 +116,7 @@ class Score(models.Model):
     seniority = models.ForeignKey(
         "Seniority", on_delete=models.PROTECT, null=True, blank=True
     )
-    general_score = models.IntegerField(default=0)
-    junior_score = models.IntegerField(default=0)
-    number_of_junior_series = models.IntegerField(default=0)
-    regular_score = models.IntegerField(default=0)
-    number_of_regular_series = models.IntegerField(default=0)
-    senior_score = models.IntegerField(default=0)
-    number_of_senior_series = models.IntegerField(default=0)
+    score_data = models.JSONField(null=True)
 
     def __str__(self):
         return f"{self.technology} - {self.quiz}"
