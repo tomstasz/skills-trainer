@@ -1,8 +1,11 @@
 import random
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology
+
+MAX_SENIORITY_LEVEL = len(SENIORITY_CHOICES)
 
 
 def template_choice(question_type):
@@ -62,6 +65,7 @@ def draw_questions(seniority_level, categories, technology, used_ids=[]):
 
 
 def save_number_of_finished_series(score):
+    """Saves each number of finished series under separate key in score json field"""
     num_of_finished_series = score.score_data["finished_series"]
     for k, v in SENIORITY_CHOICES:
         if num_of_finished_series[str(k)] > 0:
@@ -151,3 +155,58 @@ def get_question_and_score(quiz_pk, uuid):
         quiz__pk=quiz_pk, technology__pk=question.technology.pk
     ).first()
     return question, score
+
+
+def update_finished_series_status(score, current_seniority):
+    """Updates current number of finished series from each level"""
+    score.score_data["finished_series"][str(current_seniority)] += 1
+    save_number_of_finished_series(score)
+    return score
+
+
+def update_seniority_status(score, current_seniority, seniority_change_flag=False):
+    """Increases or decreases seniority level based on certain conditions"""
+    current_seniority_finished_series = score.score_data["finished_series"][
+        str(current_seniority)
+    ]
+    higher_seniority_finished_series = (
+        score.score_data["finished_series"][str(current_seniority + 1)]
+        if current_seniority != MAX_SENIORITY_LEVEL
+        else 0
+    )
+    if (  # Upgrade seniority
+        seniority_change_flag
+        and current_seniority != MAX_SENIORITY_LEVEL
+        and current_seniority_finished_series == 1
+        and higher_seniority_finished_series == 0
+    ):
+        score.score_data["seniority_level"] += 1
+    if not seniority_change_flag and current_seniority != 1:  # Downgrade seniority
+        score.score_data["seniority_level"] -= 1
+    return score
+
+
+def update_technology_status(request, score, quiz_pk):
+    """Switches to another technology or finishes quiz"""
+    quiz_finished = False
+    if (  # Technology is finished
+        score.score_data["max_num_of_questions"] - len(score.score_data["used_ids"])
+        <= 0
+    ):
+        current_technology = score.technology.pk
+        score.save()
+        request.session["technologies"].remove(current_technology)
+        if len(request.session["technologies"]) == 0:  #  Quiz is finished
+            quiz_finished = True
+        else:
+            next_tech_in_list = request.session["technologies"][
+                0
+            ]  # We take next technology in list
+            score = Score.objects.filter(
+                quiz__pk=quiz_pk, technology__pk=next_tech_in_list
+            ).first()
+            score.score_data["seniority_level"] = score.seniority.level
+            request.session["current_num_of_questions"] = score.score_data[
+                "max_num_of_questions"
+            ]
+    return score, quiz_finished

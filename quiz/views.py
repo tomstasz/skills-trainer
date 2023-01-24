@@ -23,6 +23,9 @@ from quiz.utils import (
     calculate_if_higher_seniority,
     set_initial_score_data,
     get_question_and_score,
+    update_finished_series_status,
+    update_seniority_status,
+    update_technology_status,
 )
 from quiz.serializers import QuizSerializer
 
@@ -181,51 +184,14 @@ class QuestionView(View):
             len(score.score_data["used_ids"]) % score.score_data["num_in_series"] == 0
         ):  # single serie of questions ends
             current_seniority = score.score_data["seniority_level"]
-            current_technology = score.technology.pk
-            score.score_data["finished_series"][str(current_seniority)] += 1
-            save_number_of_finished_series(score)
+            update_finished_series_status(score, current_seniority)
             seniority_change_flag = calculate_if_higher_seniority(
                 score, current_seniority
             )
-            current_seniority_finished_series = score.score_data["finished_series"][
-                str(current_seniority)
-            ]
-            higher_seniority_finished_series = (
-                score.score_data["finished_series"][str(current_seniority + 1)]
-                if current_seniority != MAX_SENIORITY_LEVEL
-                else 0
-            )
-            if (  # Upgrade seniority
-                seniority_change_flag
-                and current_seniority != MAX_SENIORITY_LEVEL
-                and current_seniority_finished_series == 1
-                and higher_seniority_finished_series == 0
-            ):
-                score.score_data["seniority_level"] += 1
-            if (  # Downgrade seniority
-                not seniority_change_flag and current_seniority != 1
-            ):
-                score.score_data["seniority_level"] -= 1
-            if (  # Technology is finished
-                score.score_data["max_num_of_questions"]
-                - len(score.score_data["used_ids"])
-                <= 0
-            ):
-                score.save()
-                request.session["technologies"].remove(current_technology)
-                if len(request.session["technologies"]) == 0:  #  Quiz is finished
-                    return redirect(reverse("quiz:quiz-view"))
-                else:
-                    next_tech_in_list = request.session["technologies"][
-                        0
-                    ]  # We take next technology in list
-                    score = Score.objects.filter(
-                        quiz__pk=quiz_pk, technology__pk=next_tech_in_list
-                    ).first()
-                    score.score_data["seniority_level"] = score.seniority.level
-                    request.session["current_num_of_questions"] = score.score_data[
-                        "max_num_of_questions"
-                    ]
+            update_seniority_status(score, current_seniority, seniority_change_flag)
+            score, quiz_finished = update_technology_status(request, score, quiz_pk)
+            if quiz_finished:
+                return redirect(reverse("quiz:quiz-view"))
         next_question_pk = draw_questions(
             seniority_level=score.score_data["seniority_level"],
             categories=score.score_data["categories"],
