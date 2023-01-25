@@ -1,6 +1,6 @@
 import random
 
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology
@@ -32,10 +32,10 @@ def update_score(score):
 def del_session_keys(request):
     """Utility function cleaning session keys
     for local testing purposes"""
-    if request.session.get("current_num_of_questions") is not None:
-        del request.session["current_num_of_questions"]
     if request.session.get("technologies") is not None:
         del request.session["technologies"]
+    if request.session.get("current_technology") is not None:
+        del request.session["current_technology"]
     # if request.session.get("django_timezone") is not None:
     #     del request.session["django_timezone"]
     print("Session clear")
@@ -70,6 +70,7 @@ def save_number_of_finished_series(score):
     for k, v in SENIORITY_CHOICES:
         if num_of_finished_series[str(k)] > 0:
             score.score_data[f"number_of_{v}_series"] = num_of_finished_series[str(k)]
+    score.save()
     return score
 
 
@@ -149,12 +150,11 @@ def calculate_multiplayer(key, num_of_finished_series, single_serie_length):
     return multiplayer
 
 
-def get_question_and_score(quiz_pk, uuid):
-    question = get_object_or_404(Question, uuid=uuid)
-    score = Score.objects.filter(
-        quiz__pk=quiz_pk, technology__pk=question.technology.pk
-    ).first()
-    return question, score
+def prepare_technologies_in_session(request, score):
+    if request.session.get("technologies") is None:
+        request.session["technologies"] = [
+            technology for technology in score.score_data["technologies"]
+        ]
 
 
 def update_finished_series_status(score, current_seniority):
@@ -195,7 +195,8 @@ def update_technology_status(request, score, quiz_pk):
     ):
         current_technology = score.technology.pk
         score.save()
-        request.session["technologies"].remove(current_technology)
+        if current_technology in request.session["technologies"]:
+            request.session["technologies"].remove(current_technology)
         if len(request.session["technologies"]) == 0:  #  Quiz is finished
             quiz_finished = True
         else:
@@ -205,8 +206,16 @@ def update_technology_status(request, score, quiz_pk):
             score = Score.objects.filter(
                 quiz__pk=quiz_pk, technology__pk=next_tech_in_list
             ).first()
+            request.session["current_technology"] = next_tech_in_list
             score.score_data["seniority_level"] = score.seniority.level
-            request.session["current_num_of_questions"] = score.score_data[
-                "max_num_of_questions"
-            ]
+            score.save()
     return score, quiz_finished
+
+
+def is_current_pk_used(quiz_pk, question_pk):
+    quiz = get_object_or_404(Quiz, pk=quiz_pk)
+    found_pk = False
+    for score in quiz.score_set.all():
+        if question_pk in score.score_data["used_ids"]:
+            found_pk = True
+    return found_pk

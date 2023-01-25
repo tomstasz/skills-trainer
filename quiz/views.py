@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.views import View
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import strip_tags
+from django.template.response import TemplateResponse
 from rest_framework import viewsets
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology, Seniority
@@ -18,11 +19,12 @@ from quiz.utils import (
     del_session_keys,
     del_quiz_session_data,
     draw_questions,
+    is_current_pk_used,
+    prepare_technologies_in_session,
     save_number_of_finished_series,
     calculate_percentage,
     calculate_if_higher_seniority,
     set_initial_score_data,
-    get_question_and_score,
     update_finished_series_status,
     update_seniority_status,
     update_technology_status,
@@ -136,12 +138,39 @@ class QuizView(View):
 class QuestionView(View):
     def get(self, request, uuid):
         quiz_pk = request.GET.get("q")
-        question, score = get_question_and_score(quiz_pk, uuid)
-        if question.pk not in score.score_data["used_ids"]:
+        question = get_object_or_404(Question, uuid=uuid)
+        if request.session.get("current_technology") is None:
+            request.session["current_technology"] = question.technology.pk
+        score = Score.objects.filter(
+            quiz__pk=quiz_pk, technology__pk=request.session["current_technology"]
+        ).first()
+        if not is_current_pk_used(quiz_pk, question.pk):
             score.score_data["used_ids"].append(question.pk)
             score.score_data["seniority_level"] = question.seniority.level
-        else:
-            print("USED PK")
+        else:  # scenario in which original quiz link was used more than once or browser buttons were pushed (current question.pk already in base)
+            current_seniority = score.score_data["seniority_level"]
+            prepare_technologies_in_session(request, score)
+            if (
+                len(score.score_data["used_ids"]) % score.score_data["num_in_series"]
+                == 0
+            ):  # single serie of questions ends
+                update_finished_series_status(score, current_seniority)
+                update_seniority_status(score, current_seniority)
+                score, quiz_finished = update_technology_status(request, score, quiz_pk)
+                if quiz_finished:
+                    return redirect(reverse("quiz:quiz-view"))
+            next_question_pk = draw_questions(
+                seniority_level=score.score_data["seniority_level"],
+                categories=score.score_data["categories"],
+                technology=score.technology.pk,
+                used_ids=score.score_data["used_ids"],
+            )
+            next_question = get_object_or_404(Question, pk=next_question_pk)
+            score.save()
+            return redirect(
+                reverse("quiz:question-view", kwargs={"uuid": next_question.uuid})
+                + f"?q={quiz_pk}"
+            )
         score.save()
         ctx = {}
         answers = question.get_answers()
@@ -150,20 +179,20 @@ class QuestionView(View):
         if question.question_type == "multiple choice":
             ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
-        return render(request, template, ctx)
+        response = TemplateResponse(request, template, ctx)
+        response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = "0"
+        return response
 
     def post(self, request, uuid):
         quiz_pk = request.GET.get("q")
-        question, score = get_question_and_score(quiz_pk, uuid)
+        question = get_object_or_404(Question, uuid=uuid)
+        score = Score.objects.filter(
+            quiz__pk=quiz_pk, technology__pk=request.session["current_technology"]
+        ).first()
         answers = question.get_answers()
-        if request.session.get("current_num_of_questions") is None:
-            request.session["current_num_of_questions"] = score.score_data[
-                "max_num_of_questions"
-            ]
-            request.session["technologies"] = [
-                technology for technology in score.score_data["technologies"]
-            ]
-        # different question types check
+        prepare_technologies_in_session(request, score)
         if question.question_type == "open" or question.question_type == "true/false":
             ans = strip_tags(answers[0].text)
             user_answer = request.POST.get("ans")
@@ -179,7 +208,6 @@ class QuestionView(View):
             correct_answers_ids.sort()
             if data == correct_answers_ids:
                 score = update_score(score)
-        request.session["current_num_of_questions"] -= 1
         if (
             len(score.score_data["used_ids"]) % score.score_data["num_in_series"] == 0
         ):  # single serie of questions ends
