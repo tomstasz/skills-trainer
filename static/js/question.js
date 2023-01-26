@@ -4,6 +4,8 @@ $(function() {
     const timerDiv = document.getElementById("timer");
     const csrf = document.getElementsByName('csrfmiddlewaretoken');
     const data = {}
+    const performance = window.performance.getEntriesByType('navigation').map((nav) => nav.type);
+    const pageActions = ['reload', 'back_forward'];
     data['csrfmiddlewaretoken'] = csrf[0].value
     let displaySec
     let displayMin
@@ -52,21 +54,21 @@ $(function() {
                 $("#question-form").submit();
             }
 
-            window.onpageshow = function (event) {
-                if (event.persisted) {
-                    timerDiv.innerHTML = "<b>00:00</b>"
-                    clearInterval(timer);
-                    localStorage.removeItem("remainingSec");
-                    localStorage.removeItem("remainingMin");
-                    window.history.forward();
-                    $("#question-form").submit();
-                }
-            };
             timerDiv.innerHTML = `<b>${displayMin}:${displaySec}</b>`
         }, 1000)
+
 
     };
 
     timeStart(time);
+
+    // refreshes timer when page reloaded
+    if (pageActions.includes(performance[0])) {
+        clearInterval(timer);
+        localStorage.removeItem("remainingSec");
+        localStorage.removeItem("remainingMin");
+        timeStart(time);
+    };
+
 
 });

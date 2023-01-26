@@ -155,7 +155,10 @@ class QuestionView(View):
                 == 0
             ):  # single serie of questions ends
                 update_finished_series_status(score, current_seniority)
-                update_seniority_status(score, current_seniority)
+                seniority_change_flag = calculate_if_higher_seniority(
+                    score, current_seniority
+                )
+                update_seniority_status(score, current_seniority, seniority_change_flag)
                 score, quiz_finished = update_technology_status(request, score, quiz_pk)
                 if quiz_finished:
                     return redirect(reverse("quiz:quiz-view"))
