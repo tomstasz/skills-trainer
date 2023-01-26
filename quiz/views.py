@@ -71,10 +71,12 @@ class QuizView(View):
             user_name = form.cleaned_data["user_name"]
             email = form.cleaned_data["email"]
             number_of_questions = form.cleaned_data["number_of_questions"]
+            mode = form.cleaned_data["mode"]
             quiz = Quiz.objects.create(
                 user_name=user_name,
                 email=email,
                 number_of_questions=number_of_questions,
+                mode=mode,
             )
             quiz.category.set(category)
             quiz.technology.set(technology)

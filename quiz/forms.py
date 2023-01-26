@@ -1,26 +1,19 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from quiz.models import Quiz, Technology
+from quiz.models import Quiz, Technology, MODE_CHOICES
 
 
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        exclude = [
-            "general_score",
-            "junior_score",
-            "regular_score",
-            "senior_score",
-            "number_of_junior_series",
-            "number_of_regular_series",
-            "number_of_senior_series",
-            "created_at",
-        ]
+        exclude = ["created_at"]
+        widgets = {"mode": forms.Select}
 
     field_order = [
         "user_name",
         "email",
+        "mode",
         "number_of_questions",
         "category",
         "technology",
@@ -35,4 +28,4 @@ class UserEmailForm(forms.ModelForm):
     class Meta:
         model = Quiz
         fields = ["email"]
-        widgets = {"email": forms.Select()}
+        widgets = {"email": forms.Select}

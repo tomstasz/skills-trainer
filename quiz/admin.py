@@ -18,8 +18,8 @@ class AuthorAdmin(admin.ModelAdmin):
 
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ("user_name", "email")
-    readonly_fields = ("created_at",)
+    list_display = ("user_name", "email", "mode")
+    readonly_fields = ("created_at", "mode")
 
 
 class QuestionAdmin(TranslationAdmin):

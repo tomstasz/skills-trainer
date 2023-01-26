@@ -31,6 +31,11 @@ LANGUAGE_CHOICES = (
     ("German", "German"),
 )
 
+MODE_CHOICES = (
+    ("recruitment", _("Recruitment")),
+    ("training", _("Training")),
+)
+
 
 class Quiz(models.Model):
     category = models.ManyToManyField("Category", verbose_name=_("category"))
@@ -41,6 +46,7 @@ class Quiz(models.Model):
         _("Number of questions"), choices=NUM_OF_QUESTIONS
     )
     created_at = models.DateTimeField(default=timezone.now)
+    mode = models.CharField(_("Mode"), max_length=32, choices=MODE_CHOICES)
 
     class Meta:
         verbose_name_plural = "quizes"
