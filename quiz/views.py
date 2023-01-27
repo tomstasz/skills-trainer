@@ -66,20 +66,7 @@ class QuizView(View):
         selected_technologies = list()
         form = QuizForm(request.POST)
         if form.is_valid():
-            category = form.cleaned_data["category"]
-            technology = form.cleaned_data["technology"]
-            user_name = form.cleaned_data["user_name"]
-            email = form.cleaned_data["email"]
-            number_of_questions = form.cleaned_data["number_of_questions"]
-            mode = form.cleaned_data["mode"]
-            quiz = Quiz.objects.create(
-                user_name=user_name,
-                email=email,
-                number_of_questions=number_of_questions,
-                mode=mode,
-            )
-            quiz.category.set(category)
-            quiz.technology.set(technology)
+            quiz = form.save()
             for tech in list(quiz.technology.all()):
                 score_data = set_initial_score_data(quiz)
                 Score.objects.create(technology=tech, quiz=quiz, score_data=score_data)
@@ -88,6 +75,9 @@ class QuizView(View):
             ctx["seniority_levels"] = SENIORITY_CHOICES
             request.session["quiz_pk"] = quiz.pk
             request.session["selected_technologies"] = selected_technologies
+        else:
+            ctx["quiz_form_err"] = form
+
         if (
             "tech-submit" in request.POST
             and all(  # check if seniority is set for all chosen technologies

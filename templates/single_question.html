@@ -12,9 +12,9 @@
 
 {% block content %}
 <div class="row">
-<div class="col">
+<div class="col question">
     <div class="question-div" id="question-div" data-value={{ question.text }}>
-        {{ question.text | safe }}    <b>Seniority: {{ question.seniority }}, Technologia: {{ question.technology }}</b>
+        {{ question.text | safe }}
     </div>
 </div>
 <div class="col" id="timer">
@@ -22,7 +22,7 @@
 </div>
 </div>
 <div class="row">
-    <div class="col">
+    <div class="col answer">
     <form id="question-form" action="" method="post">
         {% csrf_token %}
         {% for answer in answers %}
@@ -36,6 +36,10 @@
     {% if question.is_author %}
         <p>Autor: {{ question.author }}</p>
     {% endif %}
+    </div>
+    <div class="col train-data">
+        <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
+        <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>
     </div>
 </div>
 {% endblock content %}

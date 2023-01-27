@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-26 16:38+0100\n"
+"POT-Creation-Date: 2023-01-27 18:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,35 +20,44 @@ msgstr ""
 "(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
 "n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
-#: quiz/models.py:35
+#: quiz/models.py:37
 msgid "Recruitment"
 msgstr "Rekrutacyjny"
 
-#: quiz/models.py:36
+#: quiz/models.py:38
 msgid "Training"
 msgstr "Treningowy"
 
-#: quiz/models.py:41
+#: quiz/models.py:43
 msgid "category"
 msgstr "Obszar"
 
-#: quiz/models.py:42
+#: quiz/models.py:44
 msgid "technology"
 msgstr "Technologia"
 
-#: quiz/models.py:43
+#: quiz/models.py:45
 msgid "User Name"
 msgstr "Nazwa użytkownika"
 
-#: quiz/models.py:46
+#: quiz/models.py:48
 msgid "Number of questions"
 msgstr "Liczba pytań"
 
-#: quiz/models.py:49
+#: quiz/models.py:51
 msgid "Mode"
 msgstr "Tryb"
 
-#: quiz/models.py:132
+#: quiz/models.py:63
+msgid "Email address is incorrect."
+msgstr "Podaj poprawny adres email."
+
+#: quiz/models.py:65
+msgid "Email address is already taken."
+msgstr "Podany adres email jest już zajęty."
+
+#: quiz/models.py:142 templates/boolean_question.html:43
+#: templates/single_question.html:42 templates/single_question_open.html:41
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
@@ -60,12 +69,12 @@ msgstr "Warszawa"
 msgid "New York"
 msgstr "Nowy Jork"
 
-#: quiz/views.py:125
+#: quiz/views.py:117
 msgid ""
 "Quiz will not be generated without setting seniority levels.\n"
 "                                Please try to fill the fields again."
 msgstr ""
-"Quiz nie zostanie wygenerowany bez wybrania poziomu zaawansowania dla kazdej "
+"Quiz nie zostanie wygenerowany bez wybrania poziomu zaawansowania dla każdej "
 "technologii.\n"
 "                                Proszę ponownie wypełnić pola."
 
@@ -89,6 +98,11 @@ msgstr "Fałsz"
 #: templates/single_question_open.html:33
 msgid "Send"
 msgstr "Wyślij"
+
+#: templates/boolean_question.html:42 templates/single_question.html:41
+#: templates/single_question_open.html:40
+msgid "Technology"
+msgstr "Technologia"
 
 #: templates/index.html:19
 msgid "Time zone:"

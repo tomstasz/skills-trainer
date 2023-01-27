@@ -19,9 +19,9 @@ $(function() {
 
     const timeStart = (time) => {
         if (!(localStorage.getItem("remainingSec")) && !(localStorage.getItem("remainingMin")) && (time.toString().length < 2)) {
-            timerDiv.innerHTML = `<b>0${time}:00</b>`;
+            timerDiv.innerHTML = `<h4><b>0${time}:00</b></h4>`
         } else if (!(localStorage.getItem("remainingSec")) && !(localStorage.getItem("remainingMin")) && (time.toString().length >= 2)){
-            timerDiv.innerHTML = `<b>${time}:00</b>`
+            timerDiv.innerHTML = `<h4><b>${time}:00</b></h4>`
         }
         let initialMinutes = time - 1
         let initialSeconds = 60
@@ -47,14 +47,14 @@ $(function() {
                 displaySec = seconds
             }
             if (minutes == 0 && seconds == 0) {
-                timerDiv.innerHTML = "<b>00:00</b>"
+                timerDiv.innerHTML = `<h4><b>00:00</b></h4>`
                 clearInterval(timer);
                 localStorage.removeItem("remainingSec");
                 localStorage.removeItem("remainingMin");
                 $("#question-form").submit();
             }
 
-            timerDiv.innerHTML = `<b>${displayMin}:${displaySec}</b>`
+            timerDiv.innerHTML = `<h4><b>${displayMin}:${displaySec}</b></h4>`
         }, 1000)
 
 

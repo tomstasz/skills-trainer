@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-26 16:38+0100\n"
+"POT-Creation-Date: 2023-01-27 18:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,35 +18,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: quiz/models.py:35
+#: quiz/models.py:37
 msgid "Recruitment"
 msgstr ""
 
-#: quiz/models.py:36
+#: quiz/models.py:38
 msgid "Training"
 msgstr ""
 
-#: quiz/models.py:41
+#: quiz/models.py:43
 msgid "category"
 msgstr ""
 
-#: quiz/models.py:42
+#: quiz/models.py:44
 msgid "technology"
 msgstr ""
 
-#: quiz/models.py:43
+#: quiz/models.py:45
 msgid "User Name"
 msgstr ""
 
-#: quiz/models.py:46
+#: quiz/models.py:48
 msgid "Number of questions"
 msgstr ""
 
-#: quiz/models.py:49
+#: quiz/models.py:51
 msgid "Mode"
 msgstr ""
 
-#: quiz/models.py:132
+#: quiz/models.py:63
+msgid "Email address is incorrect."
+msgstr ""
+
+#: quiz/models.py:65
+msgid "Email address is already taken."
+msgstr ""
+
+#: quiz/models.py:142 templates/boolean_question.html:43
+#: templates/single_question.html:42 templates/single_question_open.html:41
 msgid "Seniority"
 msgstr ""
 
@@ -58,7 +67,7 @@ msgstr ""
 msgid "New York"
 msgstr ""
 
-#: quiz/views.py:125
+#: quiz/views.py:117
 msgid ""
 "Quiz will not be generated without setting seniority levels.\n"
 "                                Please try to fill the fields again."
@@ -83,6 +92,11 @@ msgstr ""
 #: templates/boolean_question.html:35 templates/single_question.html:34
 #: templates/single_question_open.html:33
 msgid "Send"
+msgstr ""
+
+#: templates/boolean_question.html:42 templates/single_question.html:41
+#: templates/single_question_open.html:40
+msgid "Technology"
 msgstr ""
 
 #: templates/index.html:19

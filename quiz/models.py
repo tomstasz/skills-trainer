@@ -1,6 +1,8 @@
 import uuid
 from django.db import models
 
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -53,6 +55,14 @@ class Quiz(models.Model):
 
     def __str__(self):
         return f"{self.user_name} - {self.email}"
+
+    def clean(self):
+        try:
+            validate_email(self.email)
+        except:
+            raise ValidationError(_("Email address is incorrect."))
+        if Quiz.objects.filter(email=self.email).exists():
+            raise ValidationError(_("Email address is already taken."))
 
 
 class Question(models.Model):

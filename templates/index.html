@@ -32,11 +32,21 @@
     {{ quiz_form.as_p }}
     <button type="submit">{% translate "Save" %}</button>
 </form>
+{% if quiz_form_err and not message and not first_question_uuid %}
+    <br>
+    {% for error in quiz_form_err.non_field_errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
 <br>
 {% if request.POST and selected_technologies %}
     {% include 'seniority.html' %}
 {% elif request.POST and message %}
-    </b><span style="color:red;">{{ message }}</span></p>
+    <div class="alert alert-danger">
+        <strong>{{ message }}</strong>
+    </div>
 {% endif %}
 
 {% if request.POST and first_question_uuid %}
