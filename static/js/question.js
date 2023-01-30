@@ -5,7 +5,7 @@ $(function() {
     const csrf = document.getElementsByName('csrfmiddlewaretoken');
     const data = {}
     const performance = window.performance.getEntriesByType('navigation').map((nav) => nav.type);
-    const pageActions = ['reload', 'back_forward'];
+    const pageActions = ['reload', 'back_forward', 'navigate'];
     data['csrfmiddlewaretoken'] = csrf[0].value
     let displaySec
     let displayMin
@@ -64,7 +64,6 @@ $(function() {
 
     // refreshes timer when page reloaded
     if (pageActions.includes(performance[0])) {
-        clearInterval(timer);
         localStorage.removeItem("remainingSec");
         localStorage.removeItem("remainingMin");
         timeStart(time);

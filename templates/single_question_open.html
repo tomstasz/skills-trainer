@@ -11,19 +11,12 @@
 {% endblock title %}
 
 {% block content %}
-<div class="row">
-    <div class="col question">
-        <div class="question-div" id="question-div" data-value={{ question.text }}>
-            {{ question.text | safe }}
-        </div>
+<div class="col1">
+    <div id="question" data-value={{ question.text }}>
+        {{ question.text | safe }}
     </div>
-    <div class="col" id="timer">
-        <div class="not-visible" id="time" data-value={{ time }}></div>
-    </div>
-</div>
-<div class="row">
-    <div class="col answer">
-        <form id="question-form" action="" method="post">
+    <div id="answer">
+        <form id="answer-form" action="" method="post">
             {% csrf_token %}
             {% translate "Your answer:" %}
             <label>
@@ -36,9 +29,16 @@
             <p>Autor: {{ question.author }}</p>
         {% endif %}
     </div>
-    <div class="col train-data">
+</div>
+<div class="col2">
+    <div class="col" id="timer">
+        <div class="not-visible" id="time" data-value={{ time }}></div>
+    </div>
+    {% if mode == "training" %}
+    <div id="train-data">
         <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
         <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>
     </div>
+    {% endif %}
 </div>
 {% endblock content %}

@@ -23,3 +23,13 @@ input[type="checkbox"] {
     margin-left: -20px;
     margin-top: 4px;
 }
+
+.col1 {
+    display: block;
+    float: left;
+}
+
+.col2 {
+    display: block;
+    float: right;
+}

@@ -188,7 +188,7 @@ def update_seniority_status(score, current_seniority, seniority_change_flag=Fals
 
 def update_technology_status(request, score, quiz_pk):
     """Switches to another technology or finishes quiz"""
-    quiz_finished = False
+    is_quiz_finished = False
     if (  # Technology is finished
         score.score_data["max_num_of_questions"] - len(score.score_data["used_ids"])
         <= 0
@@ -198,7 +198,7 @@ def update_technology_status(request, score, quiz_pk):
         if current_technology in request.session["technologies"]:
             request.session["technologies"].remove(current_technology)
         if len(request.session["technologies"]) == 0:  #  Quiz is finished
-            quiz_finished = True
+            is_quiz_finished = True
         else:
             next_tech_in_list = request.session["technologies"][
                 0
@@ -209,11 +209,10 @@ def update_technology_status(request, score, quiz_pk):
             request.session["current_technology"] = next_tech_in_list
             score.score_data["seniority_level"] = score.seniority.level
             score.save()
-    return score, quiz_finished
+    return score, is_quiz_finished
 
 
-def is_current_pk_used(quiz_pk, question_pk):
-    quiz = get_object_or_404(Quiz, pk=quiz_pk)
+def is_current_pk_used(quiz, question_pk):
     found_pk = False
     for score in quiz.score_set.all():
         if question_pk in score.score_data["used_ids"]:

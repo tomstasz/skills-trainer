@@ -130,13 +130,14 @@ class QuizView(View):
 class QuestionView(View):
     def get(self, request, uuid):
         quiz_pk = request.GET.get("q")
+        quiz = get_object_or_404(Quiz, pk=quiz_pk)
         question = get_object_or_404(Question, uuid=uuid)
         if request.session.get("current_technology") is None:
             request.session["current_technology"] = question.technology.pk
         score = Score.objects.filter(
             quiz__pk=quiz_pk, technology__pk=request.session["current_technology"]
         ).first()
-        if not is_current_pk_used(quiz_pk, question.pk):
+        if not is_current_pk_used(quiz, question.pk):
             score.score_data["used_ids"].append(question.pk)
             score.score_data["seniority_level"] = question.seniority.level
         else:  # scenario in which original quiz link was used more than once or browser buttons were pushed (current question.pk already in base)
@@ -151,8 +152,10 @@ class QuestionView(View):
                     score, current_seniority
                 )
                 update_seniority_status(score, current_seniority, seniority_change_flag)
-                score, quiz_finished = update_technology_status(request, score, quiz_pk)
-                if quiz_finished:
+                score, is_quiz_finished = update_technology_status(
+                    request, score, quiz_pk
+                )
+                if is_quiz_finished:
                     return redirect(reverse("quiz:quiz-view"))
             next_question_pk = draw_questions(
                 seniority_level=score.score_data["seniority_level"],
@@ -171,6 +174,7 @@ class QuestionView(View):
         answers = question.get_answers()
         ctx["question"] = question
         ctx["time"] = question.time
+        ctx["mode"] = quiz.mode
         if question.question_type == "multiple choice":
             ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
@@ -212,8 +216,8 @@ class QuestionView(View):
                 score, current_seniority
             )
             update_seniority_status(score, current_seniority, seniority_change_flag)
-            score, quiz_finished = update_technology_status(request, score, quiz_pk)
-            if quiz_finished:
+            score, is_quiz_finished = update_technology_status(request, score, quiz_pk)
+            if is_quiz_finished:
                 return redirect(reverse("quiz:quiz-view"))
         next_question_pk = draw_questions(
             seniority_level=score.score_data["seniority_level"],
