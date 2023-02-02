@@ -11,20 +11,31 @@
 {% endblock title %}
 
 {% block content %}
+<div id="all">
 <div class="col1">
-    <div id="question" data-value={{ question.text }}>
+    <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz_pk }}>
         {{ question.text | safe }}
     </div>
     <div id="answer">
-        <form id="answer-form" action="" method="post">
-            {% csrf_token %}
-            {% translate "Your answer:" %}
-            <label>
-            <input type="text" name="ans">
-            </label>
-            <br>
-            <button type="submit" id="question-submit">{% translate "Send" %}</button>
-        </form>
+        {% if correct_answers != None %}
+            <h4><div>{% translate "Correct answers:" %}</div></h4>
+            {% for ans in correct_answers %}
+                <div class="alert alert-success">{{ ans.text | safe}}</div>
+            {% endfor %}
+            {% include 'continue_form.html' %}
+            <div class="not-visible" id="zero-timer">1</div>
+        {% else %}
+            <form id="answer-form" action="" method="post">
+                {% csrf_token %}
+                {% translate "Your answer:" %}
+                <label>
+                    <input type="text" name="ans">
+                </label>
+                <br>
+                <button type="submit" id="question-submit">{% translate "Send" %}</button>
+                <div class="not-visible" id="zero-timer">0</div>
+            </form>
+        {% endif %}
         {% if question.is_author %}
             <p>Autor: {{ question.author }}</p>
         {% endif %}
@@ -35,10 +46,11 @@
         <div class="not-visible" id="time" data-value={{ time }}></div>
     </div>
     {% if mode == "training" %}
-    <div id="train-data">
-        <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
-        <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>
-    </div>
+        <div id="train-data">
+            <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
+            <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>
+        </div>
     {% endif %}
+</div>
 </div>
 {% endblock content %}

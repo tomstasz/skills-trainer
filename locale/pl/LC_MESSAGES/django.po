@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-27 18:26+0100\n"
+"POT-Creation-Date: 2023-02-02 17:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,20 +56,20 @@ msgstr "Podaj poprawny adres email."
 msgid "Email address is already taken."
 msgstr "Podany adres email jest już zajęty."
 
-#: quiz/models.py:142 templates/boolean_question.html:43
-#: templates/single_question.html:42 templates/single_question_open.html:41
+#: quiz/models.py:142 templates/boolean_question.html:57
+#: templates/single_question.html:56 templates/single_question_open.html:51
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
-#: quiz/views.py:36
+#: quiz/views.py:37
 msgid "Warsaw"
 msgstr "Warszawa"
 
-#: quiz/views.py:37
+#: quiz/views.py:38
 msgid "New York"
 msgstr "Nowy Jork"
 
-#: quiz/views.py:117
+#: quiz/views.py:118
 msgid ""
 "Quiz will not be generated without setting seniority levels.\n"
 "                                Please try to fill the fields again."
@@ -86,23 +86,32 @@ msgstr "Angielski"
 msgid "Polish"
 msgstr "Polski"
 
-#: templates/boolean_question.html:28
+#: templates/boolean_question.html:21 templates/single_question.html:21
+#: templates/single_question_open.html:21
+msgid "Correct answers:"
+msgstr "Poprawna odpowiedź:"
+
+#: templates/boolean_question.html:24 templates/boolean_question.html:34
 msgid "True"
 msgstr "Prawda"
 
-#: templates/boolean_question.html:31
+#: templates/boolean_question.html:26 templates/boolean_question.html:37
 msgid "False"
 msgstr "Fałsz"
 
-#: templates/boolean_question.html:35 templates/single_question.html:34
-#: templates/single_question_open.html:33
+#: templates/boolean_question.html:41 templates/single_question.html:40
+#: templates/single_question_open.html:35
 msgid "Send"
 msgstr "Wyślij"
 
-#: templates/boolean_question.html:42 templates/single_question.html:41
-#: templates/single_question_open.html:40
+#: templates/boolean_question.html:56 templates/single_question.html:55
+#: templates/single_question_open.html:50
 msgid "Technology"
 msgstr "Technologia"
+
+#: templates/continue_form.html:7 templates/continue_form.html:12
+msgid "Next"
+msgstr "Dalej"
 
 #: templates/index.html:19
 msgid "Time zone:"
@@ -170,6 +179,10 @@ msgstr ""
 msgid "Generate Quiz Link"
 msgstr "Wygeneruj link do quizu"
 
-#: templates/single_question_open.html:28
+#: templates/single_question.html:23
+msgid "None of previously showed answers was correct."
+msgstr "Żadna z wyświetlonych odpowiedzi nie była prawidłowa"
+
+#: templates/single_question_open.html:30
 msgid "Your answer:"
 msgstr "Twoja odpowiedź:"

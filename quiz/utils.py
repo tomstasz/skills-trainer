@@ -218,3 +218,23 @@ def is_current_pk_used(quiz, question_pk):
         if question_pk in score.score_data["used_ids"]:
             found_pk = True
     return found_pk
+
+
+def is_max_questions_in_score_used(score):
+    return (
+        True
+        if len(score.score_data["used_ids"]) == score.score_data["max_num_of_questions"]
+        else False
+    )
+
+
+def is_max_series_in_score_used(score):
+    used_series = sum(score.score_data["finished_series"].values())
+    return True if len(SENIORITY_CHOICES) == used_series else False
+
+
+def no_cache_response(response):
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    return response

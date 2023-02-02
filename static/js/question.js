@@ -9,13 +9,15 @@ $(function() {
     data['csrfmiddlewaretoken'] = csrf[0].value
     let displaySec
     let displayMin
+    const zeroTimer = document.getElementById("zero-timer");
 
+    console.log(zeroTimer);
 
-    $("#question-form").submit(function() {
-        $(this).find(':input[type=submit]').prop('disabled', true);
-        localStorage.removeItem("remainingSec");
-        localStorage.removeItem("remainingMin");
-    });
+    // $("#answer-form").submit(function() {
+    //     $(this).find(':input[type=submit]').prop('disabled', true);
+    //     localStorage.removeItem("remainingSec");
+    //     localStorage.removeItem("remainingMin");
+    // });
 
     const timeStart = (time) => {
         if (!(localStorage.getItem("remainingSec")) && !(localStorage.getItem("remainingMin")) && (time.toString().length < 2)) {
@@ -51,12 +53,19 @@ $(function() {
                 clearInterval(timer);
                 localStorage.removeItem("remainingSec");
                 localStorage.removeItem("remainingMin");
-                $("#question-form").submit();
+                $("#answer-form").submit();
             }
 
-            timerDiv.innerHTML = `<h4><b>${displayMin}:${displaySec}</b></h4>`
-        }, 1000)
+            if (zeroTimer.innerHTML == 1) {
+                timerDiv.innerHTML = `<h4><b>00:00</b></h4>`
+                clearInterval(timer);
+                localStorage.removeItem("remainingSec");
+                localStorage.removeItem("remainingMin");
+            } else {
+                timerDiv.innerHTML = `<h4><b>${displayMin}:${displaySec}</b></h4>`
+            }
 
+        }, 1000)
 
     };
 

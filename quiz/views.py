@@ -1,9 +1,7 @@
 import random
-import threading
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404
 from django.urls import reverse
 from django.views import View
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +18,8 @@ from quiz.utils import (
     del_quiz_session_data,
     draw_questions,
     is_current_pk_used,
+    is_max_questions_in_score_used,
+    is_max_series_in_score_used,
     prepare_technologies_in_session,
     save_number_of_finished_series,
     calculate_percentage,
@@ -28,6 +28,7 @@ from quiz.utils import (
     update_finished_series_status,
     update_seniority_status,
     update_technology_status,
+    no_cache_response,
 )
 from quiz.serializers import QuizSerializer
 
@@ -137,21 +138,26 @@ class QuestionView(View):
         score = Score.objects.filter(
             quiz__pk=quiz_pk, technology__pk=request.session["current_technology"]
         ).first()
-        if not is_current_pk_used(quiz, question.pk):
+        prepare_technologies_in_session(request, score)
+        if not is_current_pk_used(
+            quiz, question.pk
+        ) and not is_max_questions_in_score_used(score):
             score.score_data["used_ids"].append(question.pk)
             score.score_data["seniority_level"] = question.seniority.level
         else:  # scenario in which original quiz link was used more than once or browser buttons were pushed (current question.pk already in base)
             current_seniority = score.score_data["seniority_level"]
-            prepare_technologies_in_session(request, score)
             if (
                 len(score.score_data["used_ids"]) % score.score_data["num_in_series"]
                 == 0
             ):  # single serie of questions ends
-                update_finished_series_status(score, current_seniority)
-                seniority_change_flag = calculate_if_higher_seniority(
-                    score, current_seniority
-                )
-                update_seniority_status(score, current_seniority, seniority_change_flag)
+                if not is_max_series_in_score_used(score):
+                    update_finished_series_status(score, current_seniority)
+                    seniority_change_flag = calculate_if_higher_seniority(
+                        score, current_seniority
+                    )
+                    update_seniority_status(
+                        score, current_seniority, seniority_change_flag
+                    )
                 score, is_quiz_finished = update_technology_status(
                     request, score, quiz_pk
                 )
@@ -175,17 +181,17 @@ class QuestionView(View):
         ctx["question"] = question
         ctx["time"] = question.time
         ctx["mode"] = quiz.mode
+        ctx["quiz_pk"] = quiz.pk
         if question.question_type == "multiple choice":
             ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
         response = TemplateResponse(request, template, ctx)
-        response["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response["Pragma"] = "no-cache"
-        response["Expires"] = "0"
+        response = no_cache_response(response)
         return response
 
     def post(self, request, uuid):
         quiz_pk = request.GET.get("q")
+        quiz = get_object_or_404(Quiz, pk=quiz_pk)
         question = get_object_or_404(Question, uuid=uuid)
         score = Score.objects.filter(
             quiz__pk=quiz_pk, technology__pk=request.session["current_technology"]
@@ -207,30 +213,58 @@ class QuestionView(View):
             correct_answers_ids.sort()
             if data == correct_answers_ids:
                 score = update_score(score)
+        continue_submit = request.POST.get("continue-submit")
+        is_quiz_finished = False
         if (
             len(score.score_data["used_ids"]) % score.score_data["num_in_series"] == 0
+            and continue_submit is None
         ):  # single serie of questions ends
             current_seniority = score.score_data["seniority_level"]
-            update_finished_series_status(score, current_seniority)
-            seniority_change_flag = calculate_if_higher_seniority(
-                score, current_seniority
-            )
-            update_seniority_status(score, current_seniority, seniority_change_flag)
+            if not is_max_series_in_score_used(score):
+                update_finished_series_status(score, current_seniority)
+                seniority_change_flag = calculate_if_higher_seniority(
+                    score, current_seniority
+                )
+                update_seniority_status(score, current_seniority, seniority_change_flag)
             score, is_quiz_finished = update_technology_status(request, score, quiz_pk)
+        score.save()
+        if not is_quiz_finished:
+            next_question_pk = draw_questions(
+                seniority_level=score.score_data["seniority_level"],
+                categories=score.score_data["categories"],
+                technology=score.technology.pk,
+                used_ids=score.score_data["used_ids"],
+            )
+            next_question = get_object_or_404(Question, pk=next_question_pk)
+            next_uuid = next_question.uuid
+        else:
+            next_uuid = None
+        if (
+            quiz.mode == "training" and continue_submit is None
+        ):  # continue_submit: button leading to next question
+            ctx = {}
+            ctx["question"] = question
+            ctx["time"] = question.time
+            ctx["mode"] = quiz.mode
+            ctx["quiz_pk"] = quiz.pk
+            ctx["answers"] = answers
+            ctx["correct_answers"] = [
+                answer for answer in answers if answer.is_correct == True
+            ]
+            ctx["next_uuid"] = next_uuid
+            if question.question_type == "multiple choice":
+                ctx["answers"] = list(answers)
+            template = template_choice(question.question_type)
+            response = TemplateResponse(request, template, ctx)
+            response = no_cache_response(response)
+            return response
+        else:
             if is_quiz_finished:
                 return redirect(reverse("quiz:quiz-view"))
-        next_question_pk = draw_questions(
-            seniority_level=score.score_data["seniority_level"],
-            categories=score.score_data["categories"],
-            technology=score.technology.pk,
-            used_ids=score.score_data["used_ids"],
-        )
-        next_question = get_object_or_404(Question, pk=next_question_pk)
-        score.save()
-        return redirect(
-            reverse("quiz:question-view", kwargs={"uuid": next_question.uuid})
-            + f"?q={quiz_pk}"
-        )
+            return redirect(
+                reverse("quiz:question-view", kwargs={"uuid": next_question.uuid})
+                + f"?q={quiz_pk}"
+            )
 
 
 class ResultsViewSet(viewsets.ReadOnlyModelViewSet):
