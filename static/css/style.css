@@ -24,6 +24,12 @@ input[type="checkbox"] {
     margin-top: 4px;
 }
 
+.col-sm {
+    display: inline;
+    float: right;
+    width: 33%;
+}
+
 .col1 {
     display: block;
     float: left;
@@ -32,4 +38,13 @@ input[type="checkbox"] {
 .col2 {
     display: block;
     float: right;
+}
+
+
+.full-div {
+    text-align: center;
+    }
+
+.alert-success {
+    width:fit-content;
 }

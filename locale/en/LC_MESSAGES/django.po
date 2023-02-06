@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-02 17:19+0100\n"
+"POT-Creation-Date: 2023-02-06 15:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,8 +54,8 @@ msgstr ""
 msgid "Email address is already taken."
 msgstr ""
 
-#: quiz/models.py:142 templates/boolean_question.html:57
-#: templates/single_question.html:56 templates/single_question_open.html:51
+#: quiz/models.py:142 templates/boolean_question.html:67
+#: templates/single_question.html:66 templates/single_question_open.html:61
 msgid "Seniority"
 msgstr ""
 
@@ -81,26 +81,26 @@ msgstr ""
 msgid "Polish"
 msgstr ""
 
-#: templates/boolean_question.html:21 templates/single_question.html:21
-#: templates/single_question_open.html:21
+#: templates/boolean_question.html:27 templates/single_question.html:27
+#: templates/single_question_open.html:27
 msgid "Correct answers:"
 msgstr ""
 
-#: templates/boolean_question.html:24 templates/boolean_question.html:34
+#: templates/boolean_question.html:30 templates/boolean_question.html:40
 msgid "True"
 msgstr ""
 
-#: templates/boolean_question.html:26 templates/boolean_question.html:37
+#: templates/boolean_question.html:32 templates/boolean_question.html:43
 msgid "False"
 msgstr ""
 
-#: templates/boolean_question.html:41 templates/single_question.html:40
-#: templates/single_question_open.html:35
+#: templates/boolean_question.html:47 templates/single_question.html:46
+#: templates/single_question_open.html:41
 msgid "Send"
 msgstr ""
 
-#: templates/boolean_question.html:56 templates/single_question.html:55
-#: templates/single_question_open.html:50
+#: templates/boolean_question.html:66 templates/single_question.html:65
+#: templates/single_question_open.html:60
 msgid "Technology"
 msgstr ""
 
@@ -108,16 +108,20 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: templates/index.html:19
+#: templates/index.html:20
 msgid "Time zone:"
 msgstr ""
 
-#: templates/index.html:25
+#: templates/index.html:26
 msgid "Set"
 msgstr ""
 
-#: templates/index.html:33
+#: templates/index.html:34
 msgid "Save"
+msgstr ""
+
+#: templates/index.html:54
+msgid "Quiz Link:"
 msgstr ""
 
 #: templates/results.html:13
@@ -172,10 +176,10 @@ msgstr ""
 msgid "Generate Quiz Link"
 msgstr ""
 
-#: templates/single_question.html:23
+#: templates/single_question.html:29
 msgid "None of previously showed answers was correct."
 msgstr ""
 
-#: templates/single_question_open.html:30
+#: templates/single_question_open.html:36
 msgid "Your answer:"
 msgstr ""

@@ -21,9 +21,9 @@ $(function() {
 
     const timeStart = (time) => {
         if (!(localStorage.getItem("remainingSec")) && !(localStorage.getItem("remainingMin")) && (time.toString().length < 2)) {
-            timerDiv.innerHTML = `<h4><b>0${time}:00</b></h4>`
+            timerDiv.innerHTML = `<h1><b>0${time}:00</b></h1>`
         } else if (!(localStorage.getItem("remainingSec")) && !(localStorage.getItem("remainingMin")) && (time.toString().length >= 2)){
-            timerDiv.innerHTML = `<h4><b>${time}:00</b></h4>`
+            timerDiv.innerHTML = `<h1><b>${time}:00</b></h1>`
         }
         let initialMinutes = time - 1
         let initialSeconds = 60
@@ -49,7 +49,7 @@ $(function() {
                 displaySec = seconds
             }
             if (minutes == 0 && seconds == 0) {
-                timerDiv.innerHTML = `<h4><b>00:00</b></h4>`
+                timerDiv.innerHTML = `<h1><b>00:00</b></h1>`
                 clearInterval(timer);
                 localStorage.removeItem("remainingSec");
                 localStorage.removeItem("remainingMin");
@@ -57,12 +57,12 @@ $(function() {
             }
 
             if (zeroTimer.innerHTML == 1) {
-                timerDiv.innerHTML = `<h4><b>00:00</b></h4>`
+                timerDiv.innerHTML = `<h1><b>00:00</b></h1>`
                 clearInterval(timer);
                 localStorage.removeItem("remainingSec");
                 localStorage.removeItem("remainingMin");
             } else {
-                timerDiv.innerHTML = `<h4><b>${displayMin}:${displaySec}</b></h4>`
+                timerDiv.innerHTML = `<h1><b>${displayMin}:${displaySec}</b></h1>`
             }
 
         }, 1000)

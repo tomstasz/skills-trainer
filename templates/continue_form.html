@@ -4,11 +4,11 @@
 {% if next_uuid != None %}
     <form id="continue-form" action="{% url 'quiz:question-view' uuid=next_uuid %}?q={{quiz_pk}}" method="post">
         {% csrf_token %}
-        <button type="submit" name="continue-submit">{% translate "Next" %}</button>
+        <button class="btn btn-default" type="submit" name="continue-submit">{% translate "Next" %}</button>
     </form>
 {% else %}
     <form id="continue-form" action="{% url 'quiz:quiz-view' %}" method="get">
         {% csrf_token %}
-        <button type="submit" name="continue-submit">{% translate "Next" %}</button>
+        <button class="btn btn-default" type="submit" name="continue-submit">{% translate "Next" %}</button>
     </form>
 {% endif %}

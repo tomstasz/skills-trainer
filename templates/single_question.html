@@ -2,60 +2,71 @@
 {% load static %}
 {% load i18n %}
 
-{% block scripts %}
+{% block javascripts %}
     <script src="/static/js/question.js"></script>
-{% endblock scripts %}
+
+    <!-- highlight.js files -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+{% endblock javascripts %}
 
 {% block title %}
     Single question
 {% endblock title %}
 
 {% block content %}
-<div id="all">
-<div class="col1">
-    <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz_pk }}>
-        {{ question.text | safe }}
-    </div>
-    <div id="answer">
-        {% if correct_answers != None %}
-            <h4><div>{% translate "Correct answers:" %}</div></h4>
-            {% if correct_answers|length == 0 %}
-                <div class="alert alert-success">{% translate "None of previously showed answers was correct." %}</div>
-            {% else %}
-                {% for ans in correct_answers %}
-                    <div class="alert alert-success">{{ ans.text | safe}}</div>
-                {% endfor %}
-            {% endif %}
-            {% include 'continue_form.html' %}
-            <div class="not-visible" id="zero-timer">1</div>
-        {% else %}
-            <form id="answer-form" action="" method="post">
-                {% csrf_token %}
-                {% for answer in answers %}
-                <label>
-                    <input type="checkbox" name={{ answer.pk }} value={{ answer.pk }} class="left">{{ answer.text | safe}}
-                </label>
-                <br>
-                {% endfor %}
-                <button type="submit" id="question-submit">{% translate "Send" %}</button>
-                <div class="not-visible" id="zero-timer">0</div>
-            </form>
-        {% endif %}
-        {% if question.is_author %}
-            <p>Autor: {{ question.author }}</p>
-        {% endif %}
-    </div>
-</div>
-<div class="col2">
-    <div id="timer">
-        <div class="not-visible" id="time" data-value={{ time }}></div>
-    </div>
-    {% if mode == "training" %}
-        <div id="train-data">
-            <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
-            <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>
+<div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="col1">
+            <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz_pk }}>
+                {{ question.text | safe }}
+            </div>
+            <div id="answer">
+                {% if correct_answers != None %}
+                    <h4><div>{% translate "Correct answers:" %}</div></h4>
+                    {% if correct_answers|length == 0 %}
+                        <div class="alert alert-success">{% translate "None of previously showed answers was correct." %}</div>
+                    {% else %}
+                        {% for ans in correct_answers %}
+                            <div class="alert alert-success">{{ ans.text | safe}}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% include 'continue_form.html' %}
+                    <div class="not-visible" id="zero-timer">1</div>
+                {% else %}
+                    <form id="answer-form" action="" method="post">
+                        {% csrf_token %}
+                        {% for answer in answers %}
+                        <label>
+                            <input type="checkbox" name={{ answer.pk }} value={{ answer.pk }} class="left">{{ answer.text | safe}}
+                        </label>
+                        <br>
+                        {% endfor %}
+                        <button class="btn btn-default" type="submit" id="question-submit">{% translate "Send" %}</button>
+                        <div class="not-visible" id="zero-timer">0</div>
+                    </form>
+                {% endif %}
+                {% if question.is_author %}
+                    <p>Autor: {{ question.author }}</p>
+                {% endif %}
+            </div>
         </div>
-    {% endif %}
-</div>
-</div>
+      </div>
+      <div class="col-sm">
+        <span></span>
+      </div>
+      <div class="col-sm">
+        <div id="timer">
+            <div class="not-visible" id="time" data-value={{ time }}></div>
+        </div>
+        {% if mode == "training" %}
+            <div id="train-data">
+                <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
+                <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>
+            </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 {% endblock content %}

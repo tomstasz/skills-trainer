@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-02 17:19+0100\n"
+"POT-Creation-Date: 2023-02-06 15:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,8 +56,8 @@ msgstr "Podaj poprawny adres email."
 msgid "Email address is already taken."
 msgstr "Podany adres email jest już zajęty."
 
-#: quiz/models.py:142 templates/boolean_question.html:57
-#: templates/single_question.html:56 templates/single_question_open.html:51
+#: quiz/models.py:142 templates/boolean_question.html:67
+#: templates/single_question.html:66 templates/single_question_open.html:61
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
@@ -86,26 +86,26 @@ msgstr "Angielski"
 msgid "Polish"
 msgstr "Polski"
 
-#: templates/boolean_question.html:21 templates/single_question.html:21
-#: templates/single_question_open.html:21
+#: templates/boolean_question.html:27 templates/single_question.html:27
+#: templates/single_question_open.html:27
 msgid "Correct answers:"
 msgstr "Poprawna odpowiedź:"
 
-#: templates/boolean_question.html:24 templates/boolean_question.html:34
+#: templates/boolean_question.html:30 templates/boolean_question.html:40
 msgid "True"
 msgstr "Prawda"
 
-#: templates/boolean_question.html:26 templates/boolean_question.html:37
+#: templates/boolean_question.html:32 templates/boolean_question.html:43
 msgid "False"
 msgstr "Fałsz"
 
-#: templates/boolean_question.html:41 templates/single_question.html:40
-#: templates/single_question_open.html:35
+#: templates/boolean_question.html:47 templates/single_question.html:46
+#: templates/single_question_open.html:41
 msgid "Send"
 msgstr "Wyślij"
 
-#: templates/boolean_question.html:56 templates/single_question.html:55
-#: templates/single_question_open.html:50
+#: templates/boolean_question.html:66 templates/single_question.html:65
+#: templates/single_question_open.html:60
 msgid "Technology"
 msgstr "Technologia"
 
@@ -113,17 +113,21 @@ msgstr "Technologia"
 msgid "Next"
 msgstr "Dalej"
 
-#: templates/index.html:19
+#: templates/index.html:20
 msgid "Time zone:"
 msgstr "Strefa czasowa:"
 
-#: templates/index.html:25
+#: templates/index.html:26
 msgid "Set"
 msgstr "Ustaw"
 
-#: templates/index.html:33
+#: templates/index.html:34
 msgid "Save"
 msgstr "Zapisz"
+
+#: templates/index.html:54
+msgid "Quiz Link:"
+msgstr "Link do quizu:"
 
 #: templates/results.html:13
 msgid "Find"
@@ -179,10 +183,10 @@ msgstr ""
 msgid "Generate Quiz Link"
 msgstr "Wygeneruj link do quizu"
 
-#: templates/single_question.html:23
+#: templates/single_question.html:29
 msgid "None of previously showed answers was correct."
 msgstr "Żadna z wyświetlonych odpowiedzi nie była prawidłowa"
 
-#: templates/single_question_open.html:30
+#: templates/single_question_open.html:36
 msgid "Your answer:"
 msgstr "Twoja odpowiedź:"
