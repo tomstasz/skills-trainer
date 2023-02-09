@@ -1,6 +1,6 @@
 import random
+import json
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
@@ -9,7 +9,7 @@ from django.utils.html import strip_tags
 from django.template.response import TemplateResponse
 from rest_framework import viewsets
 
-from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology, Seniority
+from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Seniority
 from quiz.forms import QuizForm, UserEmailForm
 from quiz.utils import (
     template_choice,
@@ -21,7 +21,6 @@ from quiz.utils import (
     is_max_questions_in_score_used,
     is_max_series_in_score_used,
     prepare_technologies_in_session,
-    save_number_of_finished_series,
     calculate_percentage,
     calculate_if_higher_seniority,
     set_initial_score_data,
@@ -56,11 +55,11 @@ class QuizView(View):
         )
 
     def post(self, request):
-        ctx = {}
+        ctx = dict()
         if (
             "timezone" in request.POST
             and request.session.get("django_timezone") != request.POST.get("timezone")
-            and not "email" in request.POST
+            and "email" not in request.POST
         ):
             request.session["django_timezone"] = request.POST["timezone"]
             return redirect("/")
@@ -113,7 +112,7 @@ class QuizView(View):
             ctx["first_question_uuid"] = first_question.uuid
             ctx["quiz_pk"] = quiz.pk
             del_quiz_session_data(request)
-        elif request.POST and not "email" in request.POST:
+        elif request.POST and "email" not in request.POST:
             ctx["message"] = _(
                 """Quiz will not be generated without setting seniority levels.
                                 Please try to fill the fields again."""
@@ -144,12 +143,12 @@ class QuestionView(View):
         ) and not is_max_questions_in_score_used(score):
             score.score_data["used_ids"].append(question.pk)
             score.score_data["seniority_level"] = question.seniority.level
-        else:  # scenario in which original quiz link was used more than once or browser buttons were pushed (current question.pk already in base)
+        else:  # scenario in which original quiz link was used more than once or browser buttons were pushed
             current_seniority = score.score_data["seniority_level"]
             if (
                 len(score.score_data["used_ids"]) % score.score_data["num_in_series"]
                 == 0
-            ):  # single serie of questions ends
+            ):  # single series of questions ends
                 if not is_max_series_in_score_used(score):
                     update_finished_series_status(score, current_seniority)
                     seniority_change_flag = calculate_if_higher_seniority(
@@ -207,9 +206,7 @@ class QuestionView(View):
             data = list(request.POST)
             data.remove("csrfmiddlewaretoken")
             data.sort()
-            correct_answers_ids = [
-                str(ans.pk) for ans in answers if ans.is_correct == True
-            ]
+            correct_answers_ids = [str(ans.pk) for ans in answers if ans.is_correct]
             correct_answers_ids.sort()
             if data == correct_answers_ids:
                 score = update_score(score)
@@ -218,7 +215,7 @@ class QuestionView(View):
         if (
             len(score.score_data["used_ids"]) % score.score_data["num_in_series"] == 0
             and continue_submit is None
-        ):  # single serie of questions ends
+        ):  # single series of questions ends
             current_seniority = score.score_data["seniority_level"]
             if not is_max_series_in_score_used(score):
                 update_finished_series_status(score, current_seniority)
@@ -242,15 +239,13 @@ class QuestionView(View):
         if (
             quiz.mode == "training" and continue_submit is None
         ):  # continue_submit: button leading to next question
-            ctx = {}
+            ctx = dict()
             ctx["question"] = question
             ctx["time"] = question.time
             ctx["mode"] = quiz.mode
             ctx["quiz_pk"] = quiz.pk
             ctx["answers"] = answers
-            ctx["correct_answers"] = [
-                answer for answer in answers if answer.is_correct == True
-            ]
+            ctx["correct_answers"] = [answer for answer in answers if answer.is_correct]
             ctx["next_uuid"] = next_uuid
             if question.question_type == "multiple choice":
                 ctx["answers"] = list(answers)
@@ -262,7 +257,7 @@ class QuestionView(View):
             if is_quiz_finished:
                 return redirect(reverse("quiz:quiz-view"))
             return redirect(
-                reverse("quiz:question-view", kwargs={"uuid": next_question.uuid})
+                reverse("quiz:question-view", kwargs={"uuid": next_uuid})
                 + f"?q={quiz_pk}"
             )
 
@@ -284,5 +279,7 @@ class ResultFormView(View):
             quiz = Quiz.objects.filter(email=request.POST["email"]).first()
             ctx["results"] = calculate_percentage(quiz)
             ctx["quiz"] = quiz
+            json_object = json.dumps(calculate_percentage(quiz), indent=4)
+            ctx["json_obj"] = json_object
         ctx["quiz_form"] = form
         return render(request, "results.html", ctx)

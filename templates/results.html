@@ -2,50 +2,30 @@
 {% load static %}
 {% load i18n %}
 
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="/static/js/results.js"></script>
+{% endblock javascripts %}
+
 {% block title %}
     Results
 {% endblock title %}
 
 {% block content %}
-<form id="result-form" action="{% url 'quiz:result-view' %}" method="post">
-    {% csrf_token %}
-    {{ quiz_form.as_p }}
-    <button type="submit" id="result-submit">{% translate "Find" %}</button>
-</form>
-<br>
-{% if quiz %}
-<div id="percent-div">
-    <h4>{% translate "User:" %} {{ quiz.user_name }}</h4>
-    <p>{% translate "Number of questions per technology:" %} {{ quiz.number_of_questions }}</p>
-    <br>
-    {% for technology, scores in results.items %}
-        <h3>{{ technology}}</h3>
-        <p>{% translate "Initial level:" %} {{ scores.seniority }}</p>
-            {% for k, v in scores.items %}
-                {% if k == "junior_score" %}
-                    <p><b>{% translate "Junior Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
-                {% endif %}
-                {% if k == "junior_questions" %}
-                    <p>{% translate "Number of junior questions:" %} {{ v }}</p>
-                {% endif %}
-                {% if k == "regular_score" %}
-                    <p><b>{% translate "Regular Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
-                {% endif %}
-                {% if k == "regular_questions" %}
-                    <p>{% translate "Number of regular questions:" %} {{ v }}</p>
-                {% endif %}
-                {% if k == "senior_score" %}
-                    <p><b>{% translate "Senior Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
-                {% endif %}
-                {% if k == "senior_questions" %}
-                    <p>{% translate "Number of senior questions:" %} {{ v }}</p>
-                {% endif %}
-                {% if k == "general_score" %}
-                    <p><b>{% translate "General Score:" %} </b><span style="color:red;">{{ v }}%</span></p>
-                {% endif %}
-            {% endfor %}
-            <br>
-    {% endfor %}
-</div>
-{% endif %}
+<div class="container">
+    <div class="row">
+      <div class="col">
+        <form id="result-form" action="{% url 'quiz:result-view' %}" method="post">
+            {% csrf_token %}
+            {{ quiz_form.as_p }}
+            <button class="btn btn-default" type="submit" id="result-submit">{% translate "Find" %}</button>
+        </form>
+        <br>
+      </div>
+    </div>
+    {% if quiz %}
+        <div id="results" data-results="{{ json_obj }}"></div>
+        <div class="row-wrapper"></div>
+    {% endif %}
+  </div>
 {% endblock content %}

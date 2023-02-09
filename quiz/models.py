@@ -40,6 +40,7 @@ MODE_CHOICES = (
 
 
 class Quiz(models.Model):
+    objects = models.Manager()
     category = models.ManyToManyField("Category", verbose_name=_("category"))
     technology = models.ManyToManyField("Technology", verbose_name=_("technology"))
     user_name = models.CharField(_("User Name"), max_length=120)
@@ -51,7 +52,7 @@ class Quiz(models.Model):
     mode = models.CharField(_("Mode"), max_length=32, choices=MODE_CHOICES)
 
     class Meta:
-        verbose_name_plural = "quizes"
+        verbose_name_plural = "quizzes"
 
     def __str__(self):
         return f"{self.user_name} - {self.email}"
@@ -66,6 +67,7 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
+    objects = models.Manager()
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     text = RichTextUploadingField(null=True, blank=True, config_name="special")
     question_type = models.CharField(max_length=64, choices=QUESTION_TYPE_CHOICES)
@@ -89,6 +91,7 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
+    objects = models.Manager()
     text = RichTextUploadingField(null=True, blank=True, config_name="special")
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -99,6 +102,7 @@ class Answer(models.Model):
 
 
 class Author(models.Model):
+    objects = models.Manager()
     name = models.CharField(max_length=64)
     company = models.CharField(max_length=64)
 
@@ -107,6 +111,7 @@ class Author(models.Model):
 
 
 class Category(models.Model):
+    objects = models.Manager()
     name = models.CharField(max_length=128)
 
     class Meta:
@@ -117,6 +122,7 @@ class Category(models.Model):
 
 
 class Technology(models.Model):
+    objects = models.Manager()
     name = models.CharField(max_length=128)
 
     class Meta:
@@ -127,6 +133,7 @@ class Technology(models.Model):
 
 
 class Score(models.Model):
+    objects = models.Manager()
     quiz = models.ForeignKey("Quiz", on_delete=models.CASCADE)
     technology = models.ForeignKey("Technology", on_delete=models.PROTECT)
     seniority = models.ForeignKey(
@@ -139,6 +146,7 @@ class Score(models.Model):
 
 
 class Seniority(models.Model):
+    objects = models.Manager()
     level = models.IntegerField(choices=SENIORITY_CHOICES, verbose_name=_("Seniority"))
 
     class Meta:
