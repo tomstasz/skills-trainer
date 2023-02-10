@@ -12,7 +12,12 @@ function setCanvas(key, row, prefix) {
     chartDiv.classList.add('chart', 'w-75', 'd-inline-block', "h-25");
     col.appendChild(chartDiv);
     let canv = document.createElement('canvas');
-    canv.setAttribute('id', `${prefix.toLowerCase()}-chart-${key.toLowerCase()}`);
+    // For some raeson js has a problem with pluses in the string
+    if(key == "C++") {
+        canv.setAttribute('id', `${prefix.toLowerCase()}-chart-c-plus`);
+    } else {
+        canv.setAttribute('id', `${prefix.toLowerCase()}-chart-${key.toLowerCase()}`);
+    }
     canv.setAttribute('height', '300px');
     canv.classList.add("chart-canvas");
     chartDiv.appendChild(canv);
@@ -22,7 +27,6 @@ function setCanvas(key, row, prefix) {
 
 if (resultsDiv != null) {
     let result = JSON.parse(resultsDiv.getAttribute('data-results'));
-    console.log(result);
 
     for (let key in result) {
         let row = document.createElement('div');
@@ -47,9 +51,16 @@ if (resultsDiv != null) {
     const BarsChart = (function() {
 
         for (let key in result) {
-            let $chartAnswersCanvas = $(`#result-chart-${key.toLowerCase()}`);
-            let $chartQuestionsCanvas = $(`#questions-chart-${key.toLowerCase()}`);
+            var $chartAnswersCanvas = $(`#result-chart-${key.toLowerCase()}`);
+            var $chartQuestionsCanvas = $(`#questions-chart-${key.toLowerCase()}`);
 
+            if(key == "C++") {
+                var $chartAnswersCanvas = $('#result-chart-c-plus');
+                var $chartQuestionsCanvas = $('#questions-chart-c-plus');
+            } else {
+                var $chartAnswersCanvas = $(`#result-chart-${key.toLowerCase()}`);
+                var $chartQuestionsCanvas = $(`#questions-chart-${key.toLowerCase()}`);
+            }
 
             function initChartAnswers($chartAnswersCanvas) {
 
