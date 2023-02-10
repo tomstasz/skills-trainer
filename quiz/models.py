@@ -41,6 +41,7 @@ MODE_CHOICES = (
 
 class Quiz(models.Model):
     objects = models.Manager()
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     category = models.ManyToManyField("Category", verbose_name=_("category"))
     technology = models.ManyToManyField("Technology", verbose_name=_("technology"))
     user_name = models.CharField(_("User Name"), max_length=120)

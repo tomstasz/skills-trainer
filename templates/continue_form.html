@@ -2,12 +2,12 @@
 {% load i18n %}
 
 {% if next_uuid != None %}
-    <form id="continue-form" action="{% url 'quiz:question-view' uuid=next_uuid %}?q={{quiz_pk}}" method="post">
+    <form id="continue-form" action="{% url 'quiz:question-view' uuid=next_uuid %}?q={{quiz.pk}}" method="post">
         {% csrf_token %}
         <button class="btn btn-default" type="submit" name="continue-submit">{% translate "Next" %}</button>
     </form>
 {% else %}
-    <form id="continue-form" action="{% url 'quiz:training-view' pk=quiz_pk %}" method="post">
+    <form id="continue-form" action="{% url 'quiz:training-view' uuid=quiz.uuid %}" method="post">
         {% csrf_token %}
         <button class="btn btn-default" type="submit" name="continue-submit">{% translate "Next" %}</button>
     </form>

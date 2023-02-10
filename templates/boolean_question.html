@@ -19,7 +19,7 @@
     <div class="row">
       <div class="col-sm">
         <div class="col1">
-            <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz_pk }}>
+            <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz.pk }}>
                 {{ question.text | safe }}
             </div>
             <div id="answer">
@@ -61,7 +61,7 @@
         <div id="timer">
             <div class="not-visible" id="time" data-value={{ time }}></div>
         </div>
-        {% if mode == "training" %}
+        {% if quiz.mode == "training" %}
             <div id="train-data">
                 <h4><div class="alert alert-info">{% translate "Technology" %}: {{ question.technology }}</div></h4>
                 <h4><div class="alert alert-info">{% translate "Seniority" %}: {{ question.seniority.get_level_display }}</div></h4>

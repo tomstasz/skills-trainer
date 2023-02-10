@@ -161,7 +161,10 @@ class QuestionView(View):
                     request, score, quiz_pk
                 )
                 if is_quiz_finished:
-                    return redirect(reverse("quiz:quiz-view"))
+                    quiz_uuid = quiz.uuid
+                    return redirect(
+                        reverse("quiz:training-view", kwargs={"uuid": quiz_uuid})
+                    )
             next_question_pk = draw_questions(
                 seniority_level=score.score_data["seniority_level"],
                 categories=score.score_data["categories"],
@@ -179,8 +182,7 @@ class QuestionView(View):
         answers = question.get_answers()
         ctx["question"] = question
         ctx["time"] = question.time
-        ctx["mode"] = quiz.mode
-        ctx["quiz_pk"] = quiz.pk
+        ctx["quiz"] = quiz
         if question.question_type == "multiple choice":
             ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
@@ -242,8 +244,7 @@ class QuestionView(View):
             ctx = dict()
             ctx["question"] = question
             ctx["time"] = question.time
-            ctx["mode"] = quiz.mode
-            ctx["quiz_pk"] = quiz.pk
+            ctx["quiz"] = quiz
             ctx["answers"] = answers
             ctx["correct_answers"] = [answer for answer in answers if answer.is_correct]
             ctx["next_uuid"] = next_uuid
@@ -255,7 +256,10 @@ class QuestionView(View):
             return response
         else:
             if is_quiz_finished:
-                return redirect(reverse("quiz:training-view", kwargs={"pk": quiz_pk}))
+                quiz_uuid = quiz.uuid
+                return redirect(
+                    reverse("quiz:training-view", kwargs={"uuid": quiz_uuid})
+                )
             return redirect(
                 reverse("quiz:question-view", kwargs={"uuid": next_uuid})
                 + f"?q={quiz_pk}"
@@ -285,10 +289,10 @@ class ResultFormView(View):
         return render(request, "results.html", ctx)
 
 
-def single_result_view(request, pk):
+def single_result_view(request, uuid):
     """View is almost identical for GET and POST methods"""
 
-    quiz = get_object_or_404(Quiz, pk=pk)
+    quiz = get_object_or_404(Quiz, uuid=uuid)
     ctx = dict()
     # continue-submit will appear only after the last question in training mode
     if "continue-submit" in request.POST:

@@ -18,5 +18,5 @@ urlpatterns = [
     path("<uuid:uuid>/", QuestionView.as_view(), name="question-view"),
     path("", include(router.urls)),
     path("find/", ResultFormView.as_view(), name="result-view"),
-    path("training-result/<int:pk>", single_result_view, name="training-view"),
+    path("training-result/<uuid:uuid>", single_result_view, name="training-view"),
 ]
