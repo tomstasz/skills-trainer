@@ -294,8 +294,7 @@ def single_result_view(request, uuid):
 
     quiz = get_object_or_404(Quiz, uuid=uuid)
     ctx = dict()
-    # continue-submit will appear only after the last question in training mode
-    if "continue-submit" in request.POST:
+    if quiz.mode == "training":
         request.session["training"] = True
     if request.session.get("training"):
         ctx["training"] = True
