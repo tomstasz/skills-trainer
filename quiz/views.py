@@ -255,7 +255,7 @@ class QuestionView(View):
             return response
         else:
             if is_quiz_finished:
-                return redirect(reverse("quiz:quiz-view"))
+                return redirect(reverse("quiz:training-view", kwargs={"pk": quiz_pk}))
             return redirect(
                 reverse("quiz:question-view", kwargs={"uuid": next_uuid})
                 + f"?q={quiz_pk}"
@@ -274,7 +274,7 @@ class ResultFormView(View):
 
     def post(self, request):
         form = UserEmailForm()
-        ctx = {}
+        ctx = dict()
         if "email" in request.POST:
             quiz = Quiz.objects.filter(email=request.POST["email"]).first()
             ctx["results"] = calculate_percentage(quiz)
@@ -283,3 +283,20 @@ class ResultFormView(View):
             ctx["json_obj"] = json_object
         ctx["quiz_form"] = form
         return render(request, "results.html", ctx)
+
+
+def single_result_view(request, pk):
+    """View is almost identical for GET and POST methods"""
+
+    quiz = get_object_or_404(Quiz, pk=pk)
+    ctx = dict()
+    # continue-submit will appear only after the last question in training mode
+    if "continue-submit" in request.POST:
+        request.session["training"] = True
+    if request.session.get("training"):
+        ctx["training"] = True
+    ctx["results"] = calculate_percentage(quiz)
+    ctx["quiz"] = quiz
+    json_object = json.dumps(calculate_percentage(quiz), indent=4)
+    ctx["json_obj"] = json_object
+    return render(request, "single_result.html", ctx)

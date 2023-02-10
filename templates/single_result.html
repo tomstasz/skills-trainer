@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="/static/js/results.js"></script>
+{% endblock javascripts %}
+
+{% block title %}
+  Single Result
+{% endblock title %}
+
+
+{% block content %}
+<div class="container">
+    {% if quiz %}
+    <h3>
+      Congratulations {{quiz.user_name}}!
+      <br>
+      You finished your quiz.
+      <br>
+      {% if training %}
+      <small class="text-muted">Here are some results:</small>
+      <div class="not-visible" id="training">Y</div>
+      {% else %}
+        <br>
+        We will contact you and inform about the result. Thank you for participating!
+      {% endif %}
+    </h3>
+    <br>
+        <div id="results" data-results="{{ json_obj }}"></div>
+        <div class="row-wrapper"></div>
+    {% endif %}
+  </div>
+{% endblock content %}

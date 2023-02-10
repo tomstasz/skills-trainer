@@ -11,13 +11,6 @@ $(function() {
     let displayMin
     const zeroTimer = document.getElementById("zero-timer");
 
-    console.log(zeroTimer);
-
-    // $("#answer-form").submit(function() {
-    //     $(this).find(':input[type=submit]').prop('disabled', true);
-    //     localStorage.removeItem("remainingSec");
-    //     localStorage.removeItem("remainingMin");
-    // });
 
     const timeStart = (time) => {
         if (!(localStorage.getItem("remainingSec")) && !(localStorage.getItem("remainingMin")) && (time.toString().length < 2)) {

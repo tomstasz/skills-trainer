@@ -36,6 +36,8 @@ def del_session_keys(request):
         del request.session["technologies"]
     if request.session.get("current_technology") is not None:
         del request.session["current_technology"]
+    if request.session.get("training") is not None:
+        del request.session["training"]
     # if request.session.get("django_timezone") is not None:
     #     del request.session["django_timezone"]
     print("Session clear")
