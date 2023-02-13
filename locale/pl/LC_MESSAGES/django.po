@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-06 15:25+0100\n"
+"POT-Creation-Date: 2023-02-13 12:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,35 +28,35 @@ msgstr "Rekrutacyjny"
 msgid "Training"
 msgstr "Treningowy"
 
-#: quiz/models.py:43
+#: quiz/models.py:45
 msgid "category"
 msgstr "Obszar"
 
-#: quiz/models.py:44
+#: quiz/models.py:46
 msgid "technology"
 msgstr "Technologia"
 
-#: quiz/models.py:45
+#: quiz/models.py:47
 msgid "User Name"
 msgstr "Nazwa użytkownika"
 
-#: quiz/models.py:48
+#: quiz/models.py:50
 msgid "Number of questions"
 msgstr "Liczba pytań"
 
-#: quiz/models.py:51
+#: quiz/models.py:53
 msgid "Mode"
 msgstr "Tryb"
 
-#: quiz/models.py:63
+#: quiz/models.py:65
 msgid "Email address is incorrect."
 msgstr "Podaj poprawny adres email."
 
-#: quiz/models.py:65
+#: quiz/models.py:67
 msgid "Email address is already taken."
 msgstr "Podany adres email jest już zajęty."
 
-#: quiz/models.py:142 templates/boolean_question.html:67
+#: quiz/models.py:151 templates/boolean_question.html:67
 #: templates/single_question.html:66 templates/single_question_open.html:61
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
@@ -92,10 +92,12 @@ msgid "Correct answers:"
 msgstr "Poprawna odpowiedź:"
 
 #: templates/boolean_question.html:30 templates/boolean_question.html:40
+#: templates/question-search.html:56
 msgid "True"
 msgstr "Prawda"
 
 #: templates/boolean_question.html:32 templates/boolean_question.html:43
+#: templates/question-search.html:59
 msgid "False"
 msgstr "Fałsz"
 
@@ -129,49 +131,17 @@ msgstr "Zapisz"
 msgid "Quiz Link:"
 msgstr "Link do quizu:"
 
-#: templates/results.html:13
+#: templates/question-search.html:21
+msgid "Find a single question (enter id or uuid):"
+msgstr "Znajdź pojedyncze pytanie (podaj id albo uuid):"
+
+#: templates/question-search.html:25 templates/results.html:21
 msgid "Find"
 msgstr "Znajdź"
 
-#: templates/results.html:18
-msgid "User:"
-msgstr "Użytkownik:"
-
-#: templates/results.html:19
-msgid "Number of questions per technology:"
-msgstr "Liczba pytań dla każdej technologii:"
-
-#: templates/results.html:23
-msgid "Initial level:"
-msgstr "Poziom startowy:"
-
-#: templates/results.html:26
-msgid "Junior Score:"
-msgstr "Poziom junior:"
-
-#: templates/results.html:29
-msgid "Number of junior questions:"
-msgstr "Liczba pytań juniorskich:"
-
-#: templates/results.html:32
-msgid "Regular Score:"
-msgstr "Poziom regular:"
-
-#: templates/results.html:35
-msgid "Number of regular questions:"
-msgstr "Liczba pytań regular:"
-
-#: templates/results.html:38
-msgid "Senior Score:"
-msgstr "Poziom senior:"
-
-#: templates/results.html:41
-msgid "Number of senior questions:"
-msgstr "Liczba pytań seniorskich:"
-
-#: templates/results.html:44
-msgid "General Score:"
-msgstr "Wynik całościowy:"
+#: templates/question-search.html:47 templates/single_question_open.html:36
+msgid "Your answer:"
+msgstr "Twoja odpowiedź:"
 
 #: templates/seniority.html:4
 msgid "Please set initial seniority for each technology in quiz:"
@@ -186,7 +156,3 @@ msgstr "Wygeneruj link do quizu"
 #: templates/single_question.html:29
 msgid "None of previously showed answers was correct."
 msgstr "Żadna z wyświetlonych odpowiedzi nie była prawidłowa"
-
-#: templates/single_question_open.html:36
-msgid "Your answer:"
-msgstr "Twoja odpowiedź:"

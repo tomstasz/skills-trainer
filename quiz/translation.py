@@ -1,14 +1,14 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from quiz.models import Answer, Question, Quiz
+from quiz.models import Answer, Question
 
 
 class QuestionTranslationOptions(TranslationOptions):
-    fields = ('text',)
+    fields = ("text",)
 
 
 class AnswerTranslationOptions(TranslationOptions):
-    fields = ('text',)
+    fields = ("text",)
 
 
 translator.register(Question, QuestionTranslationOptions)

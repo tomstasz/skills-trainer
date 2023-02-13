@@ -1,9 +1,6 @@
 import random
 
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
-
-from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Technology
+from quiz.models import Question, SENIORITY_CHOICES, Score
 
 MAX_SENIORITY_LEVEL = len(SENIORITY_CHOICES)
 
@@ -50,7 +47,9 @@ def del_quiz_session_data(request):
         del request.session["selected_technologies"]
 
 
-def draw_questions(seniority_level, categories, technology, used_ids=[]):
+def draw_questions(seniority_level, categories, technology, used_ids=None):
+    if used_ids is None:
+        used_ids = list()
     ids = list(
         Question.objects.filter(
             seniority=seniority_level, category__in=categories, technology=technology
@@ -101,7 +100,7 @@ def calculate_percentage(quiz):
     taking into account number of finished series
     from each seniority level in each technology"""
 
-    single_serie_length = quiz.number_of_questions / len(SENIORITY_CHOICES)
+    single_series_length = quiz.number_of_questions / len(SENIORITY_CHOICES)
     general_multiplayer = 100 / quiz.number_of_questions
     ctx = {}
     scores = quiz.score_set.all()
@@ -110,14 +109,16 @@ def calculate_percentage(quiz):
         num_of_finished_series = score.score_data["finished_series"]
         for k, v in SENIORITY_CHOICES:
             multiplayer = calculate_multiplayer(
-                k, num_of_finished_series, single_serie_length
+                k, num_of_finished_series, single_series_length
             )
             points = score.score_data.get(f"{v}_score")
-            serie_score = round(points * multiplayer, 1)
-            num_of_questions = int(single_serie_length * num_of_finished_series[str(k)])
+            series_score = round(points * multiplayer, 1)
+            num_of_questions = int(
+                single_series_length * num_of_finished_series[str(k)]
+            )
             # We make sure to pass only series in which user participated
-            if serie_score or num_of_questions:
-                tech_result[f"{v}_score"] = serie_score
+            if series_score or num_of_questions:
+                tech_result[f"{v}_score"] = series_score
                 tech_result[f"{v}_questions"] = num_of_questions
                 tech_result["seniority"] = score.seniority.level
         tech_result["general_score"] = round(
@@ -128,26 +129,28 @@ def calculate_percentage(quiz):
 
 
 def calculate_if_higher_seniority(score, current_seniority):
-    """Calculates single serie punctation to check if certain percentage was achieved"""
-    single_serie_length = score.score_data["num_in_series"]
+    """Calculates single series punctation to check if certain percentage was achieved"""
+    single_series_length = score.score_data["num_in_series"]
     num_of_finished_series = score.score_data["finished_series"]
+    current_series_score = 0
+    multiplayer = 0
     for k, v in SENIORITY_CHOICES:
         if k == current_seniority:
             multiplayer = calculate_multiplayer(
-                k, num_of_finished_series, single_serie_length
+                k, num_of_finished_series, single_series_length
             )
-            current_serie_score = score.score_data[f"{v}_score"]
-    result = current_serie_score * multiplayer
+            current_series_score = score.score_data[f"{v}_score"]
+    result = current_series_score * multiplayer
     return True if result >= 66 else False
 
 
-def calculate_multiplayer(key, num_of_finished_series, single_serie_length):
-    """Calculates multiplayer for single serie, or for larger number of series
-    if seniority was not changed (first serie result didnt meet the match)"""
+def calculate_multiplayer(key, num_of_finished_series, single_series_length):
+    """Calculates multiplayer for single series, or for larger number of series
+    if seniority was not changed (first series result didn't meet the match)"""
     multiplayer = (
-        100 / (num_of_finished_series[str(key)] * single_serie_length)
+        100 / (num_of_finished_series[str(key)] * single_series_length)
         if num_of_finished_series[str(key)] > 1
-        else 100 / single_serie_length
+        else 100 / single_series_length
     )
     return multiplayer
 
@@ -199,7 +202,7 @@ def update_technology_status(request, score, quiz_pk):
         score.save()
         if current_technology in request.session["technologies"]:
             request.session["technologies"].remove(current_technology)
-        if len(request.session["technologies"]) == 0:  #  Quiz is finished
+        if len(request.session["technologies"]) == 0:  # Quiz is finished
             is_quiz_finished = True
         else:
             next_tech_in_list = request.session["technologies"][

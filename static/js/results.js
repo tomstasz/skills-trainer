@@ -13,7 +13,7 @@ function setCanvas(key, row, prefix) {
     chartDiv.classList.add('chart', 'w-75', 'd-inline-block', "h-25");
     col.appendChild(chartDiv);
     let canv = document.createElement('canvas');
-    // For some raeson js has a problem with pluses in the string
+    // For some reason js has a problem with pluses in the string
     if(key == "C++") {
         canv.setAttribute('id', `${prefix.toLowerCase()}-chart-c-plus`);
     } else {

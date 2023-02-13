@@ -1,7 +1,6 @@
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
-from quiz.models import Question, Quiz, Technology, MODE_CHOICES
+from quiz.models import Quiz
 
 
 class QuizForm(forms.ModelForm):

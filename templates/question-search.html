@@ -18,7 +18,7 @@
 <div class="container">
     <div class="row">
       <div class="col">
-        <h3>Find a single question (enter id or uuid):</h3>
+        <h3>{% translate "Find a single question (enter id or uuid):" %}</h3>
         <form id="question-form" action="" method="post">
             {% csrf_token %}
             {{ question_form.as_p }}

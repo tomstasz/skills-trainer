@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-06 15:25+0100\n"
+"POT-Creation-Date: 2023-02-13 12:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,35 +26,35 @@ msgstr ""
 msgid "Training"
 msgstr ""
 
-#: quiz/models.py:43
+#: quiz/models.py:45
 msgid "category"
 msgstr ""
 
-#: quiz/models.py:44
+#: quiz/models.py:46
 msgid "technology"
 msgstr ""
 
-#: quiz/models.py:45
+#: quiz/models.py:47
 msgid "User Name"
 msgstr ""
 
-#: quiz/models.py:48
+#: quiz/models.py:50
 msgid "Number of questions"
 msgstr ""
 
-#: quiz/models.py:51
+#: quiz/models.py:53
 msgid "Mode"
 msgstr ""
 
-#: quiz/models.py:63
+#: quiz/models.py:65
 msgid "Email address is incorrect."
 msgstr ""
 
-#: quiz/models.py:65
+#: quiz/models.py:67
 msgid "Email address is already taken."
 msgstr ""
 
-#: quiz/models.py:142 templates/boolean_question.html:67
+#: quiz/models.py:151 templates/boolean_question.html:67
 #: templates/single_question.html:66 templates/single_question_open.html:61
 msgid "Seniority"
 msgstr ""
@@ -87,10 +87,12 @@ msgid "Correct answers:"
 msgstr ""
 
 #: templates/boolean_question.html:30 templates/boolean_question.html:40
+#: templates/question-search.html:56
 msgid "True"
 msgstr ""
 
 #: templates/boolean_question.html:32 templates/boolean_question.html:43
+#: templates/question-search.html:59
 msgid "False"
 msgstr ""
 
@@ -124,48 +126,16 @@ msgstr ""
 msgid "Quiz Link:"
 msgstr ""
 
-#: templates/results.html:13
+#: templates/question-search.html:21
+msgid "Find a single question (enter id or uuid):"
+msgstr ""
+
+#: templates/question-search.html:25 templates/results.html:21
 msgid "Find"
 msgstr ""
 
-#: templates/results.html:18
-msgid "User:"
-msgstr ""
-
-#: templates/results.html:19
-msgid "Number of questions per technology:"
-msgstr ""
-
-#: templates/results.html:23
-msgid "Initial level:"
-msgstr ""
-
-#: templates/results.html:26
-msgid "Junior Score:"
-msgstr ""
-
-#: templates/results.html:29
-msgid "Number of junior questions:"
-msgstr ""
-
-#: templates/results.html:32
-msgid "Regular Score:"
-msgstr ""
-
-#: templates/results.html:35
-msgid "Number of regular questions:"
-msgstr ""
-
-#: templates/results.html:38
-msgid "Senior Score:"
-msgstr ""
-
-#: templates/results.html:41
-msgid "Number of senior questions:"
-msgstr ""
-
-#: templates/results.html:44
-msgid "General Score:"
+#: templates/question-search.html:47 templates/single_question_open.html:36
+msgid "Your answer:"
 msgstr ""
 
 #: templates/seniority.html:4
@@ -178,8 +148,4 @@ msgstr ""
 
 #: templates/single_question.html:29
 msgid "None of previously showed answers was correct."
-msgstr ""
-
-#: templates/single_question_open.html:36
-msgid "Your answer:"
 msgstr ""
