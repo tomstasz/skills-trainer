@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import (
     QuestionView,
+    QuestionSearchView,
     QuizView,
     ResultsViewSet,
     ResultFormView,
@@ -19,4 +20,5 @@ urlpatterns = [
     path("", include(router.urls)),
     path("find/", ResultFormView.as_view(), name="result-view"),
     path("training-result/<uuid:uuid>", single_result_view, name="training-view"),
+    path("question-search", QuestionSearchView.as_view(), name="question-search"),
 ]

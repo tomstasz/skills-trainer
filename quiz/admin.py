@@ -24,11 +24,13 @@ class QuizAdmin(admin.ModelAdmin):
 
 class QuestionAdmin(TranslationAdmin):
     list_display = (
+        "id",
         "technology",
         "category",
         "seniority",
         "question_type",
         "text",
+        "uuid",
     )
     readonly_fields = ("created_at",)
 

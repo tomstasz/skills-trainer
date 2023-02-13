@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from quiz.models import Quiz, Technology, MODE_CHOICES
+from quiz.models import Question, Quiz, Technology, MODE_CHOICES
 
 
 class QuizForm(forms.ModelForm):
@@ -29,3 +29,8 @@ class UserEmailForm(forms.ModelForm):
         model = Quiz
         fields = ["email"]
         widgets = {"email": forms.Select}
+
+
+class QuestionSearchForm(forms.Form):
+    id = forms.IntegerField(required=False)
+    uuid = forms.UUIDField(required=False)

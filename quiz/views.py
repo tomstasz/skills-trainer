@@ -4,13 +4,14 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import strip_tags
 from django.template.response import TemplateResponse
 from rest_framework import viewsets
 
 from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Seniority
-from quiz.forms import QuizForm, UserEmailForm
+from quiz.forms import QuizForm, UserEmailForm, QuestionSearchForm
 from quiz.utils import (
     template_choice,
     update_score,
@@ -272,6 +273,8 @@ class ResultsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ResultFormView(View):
+    """View rendering results charts for recruiters"""
+
     def get(self, request):
         form = UserEmailForm()
         return render(request, "results.html", {"quiz_form": form})
@@ -290,7 +293,7 @@ class ResultFormView(View):
 
 
 def single_result_view(request, uuid):
-    """View is almost identical for GET and POST methods"""
+    """View rendering results charts for user"""
 
     quiz = get_object_or_404(Quiz, uuid=uuid)
     ctx = dict()
@@ -303,3 +306,25 @@ def single_result_view(request, uuid):
     json_object = json.dumps(calculate_percentage(quiz), indent=4)
     ctx["json_obj"] = json_object
     return render(request, "single_result.html", ctx)
+
+
+class QuestionSearchView(View):
+    def get(self, request):
+        form = QuestionSearchForm()
+        return render(request, "question-search.html", {"question_form": form})
+
+    def post(self, request):
+        form = QuestionSearchForm(request.POST)
+        ctx = dict()
+        if form.is_valid():
+            pk = form.cleaned_data["id"] if form.cleaned_data["id"] else None
+            uuid = form.cleaned_data["uuid"] if form.cleaned_data["uuid"] else None
+            question = Question.objects.filter(Q(id=pk) | Q(uuid=uuid)).first()
+            answers = question.get_answers() if question else None
+            ctx["question"] = question
+            ctx["answers"] = answers
+            if question is not None and question.question_type == "multiple choice":
+                ctx["answers"] = list(answers)
+            ctx["question_form"] = form
+
+        return render(request, "question-search.html", ctx)
