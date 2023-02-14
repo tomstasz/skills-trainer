@@ -81,9 +81,9 @@ def set_initial_score_data(quiz):
     score_data["junior_score"] = 0
     score_data["number_of_junior_series"] = 0
     score_data["regular_score"] = 0
-    score_data["number_of_junior_series"] = 0
+    score_data["number_of_regular_series"] = 0
     score_data["senior_score"] = 0
-    score_data["number_of_junior_series"] = 0
+    score_data["number_of_senior_series"] = 0
     score_data["used_ids"] = []
     score_data["seniority_level"] = 0
     score_data["num_in_series"] = int(quiz.number_of_questions / len(SENIORITY_CHOICES))

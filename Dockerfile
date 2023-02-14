@@ -1,6 +1,12 @@
 FROM python:3.9
 
-COPY . .
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
+
+COPY ./skillstrainer ./skillstrainer
+COPY ./quiz ./quiz
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1

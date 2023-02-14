@@ -1,9 +1,10 @@
-import random
 import json
+import secrets
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
+from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import strip_tags
@@ -100,7 +101,7 @@ class QuizView(View):
                     score.seniority = seniority
                     score.score_data["seniority_level"] = seniority.level
                     score.save()
-            first_question_technology = random.choice(list(quiz.technology.all()))
+            first_question_technology = secrets.choice(list(quiz.technology.all()))
             first_question_seniority = quiz.score_set.get(
                 technology=first_question_technology.pk
             ).seniority.level
@@ -292,9 +293,10 @@ class ResultFormView(View):
         return render(request, "results.html", ctx)
 
 
+@require_http_methods(["GET"])
+@require_http_methods(["POST"])
 def single_result_view(request, uuid):
     """View rendering results charts for user"""
-
     quiz = get_object_or_404(Quiz, uuid=uuid)
     ctx = dict()
     if quiz.mode == "training":
