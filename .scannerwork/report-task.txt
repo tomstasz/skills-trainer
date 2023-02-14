@@ -2,5 +2,5 @@ projectKey=Skills-trainer
 serverUrl=http://localhost:9000
 serverVersion=9.9.0.65466
 dashboardUrl=http://localhost:9000/dashboard?id=Skills-trainer
-ceTaskId=AYZPIAkYFXafXJLl7gUK
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AYZPIAkYFXafXJLl7gUK
+ceTaskId=AYZPvY-CFXafXJLl7gUT
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYZPvY-CFXafXJLl7gUT
