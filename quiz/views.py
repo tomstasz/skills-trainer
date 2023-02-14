@@ -293,9 +293,10 @@ class ResultFormView(View):
         return render(request, "results.html", ctx)
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def single_result_view(request, uuid):
     """View rendering results charts for user"""
+
     quiz = get_object_or_404(Quiz, uuid=uuid)
     ctx = dict()
     if quiz.mode == "training":
