@@ -7,7 +7,6 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from django.utils.html import strip_tags
 from django.template.response import TemplateResponse
 from rest_framework import viewsets
 
@@ -15,7 +14,7 @@ from quiz.models import Question, Quiz, SENIORITY_CHOICES, Score, Seniority
 from quiz.forms import QuizForm, UserEmailForm, QuestionSearchForm
 from quiz.utils import (
     template_choice,
-    update_score,
+    check_question_type_to_update_score,
     del_session_keys,
     del_quiz_session_data,
     draw_questions,
@@ -30,16 +29,16 @@ from quiz.utils import (
     update_seniority_status,
     update_technology_status,
     no_cache_response,
+    MULTIPLE_CHOICE,
 )
 from quiz.serializers import QuizSerializer
+
 
 TIMEZONES = {
     "----": "",
     _("Warsaw"): "Europe/Warsaw",
     _("New York"): "America/New_York",
 }
-
-MAX_SENIORITY_LEVEL = len(SENIORITY_CHOICES)
 
 
 class QuizView(View):
@@ -185,7 +184,7 @@ class QuestionView(View):
         ctx["question"] = question
         ctx["time"] = question.time
         ctx["quiz"] = quiz
-        if question.question_type == "multiple choice":
+        if question.question_type == MULTIPLE_CHOICE:
             ctx["answers"] = list(answers)
         template = template_choice(question.question_type)
         response = TemplateResponse(request, template, ctx)
@@ -201,19 +200,7 @@ class QuestionView(View):
         ).first()
         answers = question.get_answers()
         prepare_technologies_in_session(request, score)
-        if question.question_type == "open" or question.question_type == "true/false":
-            ans = strip_tags(answers[0].text)
-            user_answer = request.POST.get("ans")
-            if ans == user_answer:
-                score = update_score(score)
-        if question.question_type == "multiple choice":
-            data = list(request.POST)
-            data.remove("csrfmiddlewaretoken")
-            data.sort()
-            correct_answers_ids = [str(ans.pk) for ans in answers if ans.is_correct]
-            correct_answers_ids.sort()
-            if data == correct_answers_ids:
-                score = update_score(score)
+        score = check_question_type_to_update_score(request, question, answers, score)
         continue_submit = request.POST.get("continue-submit")
         is_quiz_finished = False
         if (
@@ -250,7 +237,7 @@ class QuestionView(View):
             ctx["answers"] = answers
             ctx["correct_answers"] = [answer for answer in answers if answer.is_correct]
             ctx["next_uuid"] = next_uuid
-            if question.question_type == "multiple choice":
+            if question.question_type == MULTIPLE_CHOICE:
                 ctx["answers"] = list(answers)
             template = template_choice(question.question_type)
             response = TemplateResponse(request, template, ctx)
@@ -325,7 +312,7 @@ class QuestionSearchView(View):
             answers = question.get_answers() if question else None
             ctx["question"] = question
             ctx["answers"] = answers
-            if question is not None and question.question_type == "multiple choice":
+            if question is not None and question.question_type == MULTIPLE_CHOICE:
                 ctx["answers"] = list(answers)
             ctx["question_form"] = form
 

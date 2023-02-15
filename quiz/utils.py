@@ -1,8 +1,11 @@
 import random
 
+from django.utils.html import strip_tags
 from quiz.models import Question, SENIORITY_CHOICES, Score
 
+
 MAX_SENIORITY_LEVEL = len(SENIORITY_CHOICES)
+MULTIPLE_CHOICE = "multiple choice"
 
 
 def template_choice(question_type):
@@ -12,6 +15,23 @@ def template_choice(question_type):
         return "single_question_open.html"
     if question_type == "true/false":
         return "boolean_question.html"
+
+
+def check_question_type_to_update_score(request, question, answers, score):
+    if question.question_type == "open" or question.question_type == "true/false":
+        ans = strip_tags(answers[0].text)
+        user_answer = request.POST.get("ans")
+        if ans == user_answer:
+            score = update_score(score)
+    if question.question_type == MULTIPLE_CHOICE:
+        data = list(request.POST)
+        data.remove("csrfmiddlewaretoken")
+        data.sort()
+        correct_answers_ids = [str(ans.pk) for ans in answers if ans.is_correct]
+        correct_answers_ids.sort()
+        if data == correct_answers_ids:
+            score = update_score(score)
+    return score
 
 
 def update_score(score):
@@ -35,8 +55,6 @@ def del_session_keys(request):
         del request.session["current_technology"]
     if request.session.get("training") is not None:
         del request.session["training"]
-    # if request.session.get("django_timezone") is not None:
-    #     del request.session["django_timezone"]
     print("Session clear")
 
 
@@ -62,7 +80,6 @@ def draw_questions(seniority_level, categories, technology, used_ids=None):
     random.shuffle(ids)
     if len(ids) > 0:
         return ids[0]
-    return
 
 
 def save_number_of_finished_series(score):

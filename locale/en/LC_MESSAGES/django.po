@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-13 12:48+0100\n"
+"POT-Creation-Date: 2023-02-15 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,16 +54,16 @@ msgstr ""
 msgid "Email address is already taken."
 msgstr ""
 
-#: quiz/models.py:151 templates/boolean_question.html:67
-#: templates/single_question.html:66 templates/single_question_open.html:61
+#: quiz/models.py:151 templates/boolean_question.html:66
+#: templates/single_question.html:66 templates/single_question_open.html:60
 msgid "Seniority"
 msgstr ""
 
-#: quiz/views.py:37
+#: quiz/views.py:39
 msgid "Warsaw"
 msgstr ""
 
-#: quiz/views.py:38
+#: quiz/views.py:40
 msgid "New York"
 msgstr ""
 
@@ -81,32 +81,32 @@ msgstr ""
 msgid "Polish"
 msgstr ""
 
-#: templates/boolean_question.html:27 templates/single_question.html:27
-#: templates/single_question_open.html:27
+#: templates/boolean_question.html:26 templates/single_question.html:27
+#: templates/single_question_open.html:26
 msgid "Correct answers:"
 msgstr ""
 
-#: templates/boolean_question.html:30 templates/boolean_question.html:40
+#: templates/boolean_question.html:29 templates/boolean_question.html:39
 #: templates/question-search.html:56
 msgid "True"
 msgstr ""
 
-#: templates/boolean_question.html:32 templates/boolean_question.html:43
+#: templates/boolean_question.html:31 templates/boolean_question.html:42
 #: templates/question-search.html:59
 msgid "False"
 msgstr ""
 
-#: templates/boolean_question.html:47 templates/single_question.html:46
-#: templates/single_question_open.html:41
+#: templates/boolean_question.html:46 templates/single_question.html:46
+#: templates/single_question_open.html:40
 msgid "Send"
 msgstr ""
 
-#: templates/boolean_question.html:66 templates/single_question.html:65
-#: templates/single_question_open.html:60
+#: templates/boolean_question.html:65 templates/single_question.html:65
+#: templates/single_question_open.html:59
 msgid "Technology"
 msgstr ""
 
-#: templates/continue_form.html:7 templates/continue_form.html:12
+#: templates/continue_form.html:7 templates/continue_form.html:11
 msgid "Next"
 msgstr ""
 
@@ -134,7 +134,7 @@ msgstr ""
 msgid "Find"
 msgstr ""
 
-#: templates/question-search.html:47 templates/single_question_open.html:36
+#: templates/question-search.html:47 templates/single_question_open.html:35
 msgid "Your answer:"
 msgstr ""
 

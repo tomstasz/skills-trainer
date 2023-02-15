@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block javascripts %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" integrity="sha256-GcknncGKzlKm69d+sp+k3A2NyQE+jnu43aBl6rrDN2I=" crossorigin="anonymous"></script>
     <script src="/static/js/results.js"></script>
 {% endblock javascripts %}
 
@@ -24,6 +24,7 @@
       </div>
     </div>
     {% if quiz %}
+        <div class="not-visible" id="training">Y</div>
         <div id="results" data-results="{{ json_obj }}"></div>
         <div class="row-wrapper"></div>
     {% endif %}

@@ -4,8 +4,8 @@ from django.db import migrations, models
 import uuid
 
 def gen_uuid(apps, schema_editor):
-    MyModel = apps.get_model('quiz', 'question')
-    for row in MyModel.objects.all():
+    model = apps.get_model('quiz', 'question')
+    for row in model.objects.all():
         row.uuid = uuid.uuid4()
         row.save(update_fields=['uuid'])
 

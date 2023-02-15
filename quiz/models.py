@@ -61,7 +61,7 @@ class Quiz(models.Model):
     def clean(self):
         try:
             validate_email(self.email)
-        except:
+        except ValidationError:
             raise ValidationError(_("Email address is incorrect."))
         if Quiz.objects.filter(email=self.email).exists():
             raise ValidationError(_("Email address is already taken."))

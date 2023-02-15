@@ -6,10 +6,13 @@ $(function() {
     const data = {}
     const performance = window.performance.getEntriesByType('navigation').map((nav) => nav.type);
     const pageActions = ['reload', 'back_forward', 'navigate'];
-    data['csrfmiddlewaretoken'] = csrf[0].value
     let displaySec
     let displayMin
     const zeroTimer = document.getElementById("zero-timer");
+
+    if (csrf[0] && csrf[0].value ) {
+        data['csrfmiddlewaretoken'] = csrf[0].value;
+    }
 
 
     const timeStart = (time) => {

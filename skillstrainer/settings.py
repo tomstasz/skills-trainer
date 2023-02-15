@@ -123,7 +123,6 @@ LANGUAGES = [
     ("pl", gettext("Polish")),
 ]
 
-# LOCALE_PATHS = [BASE_DIR / "locale"]
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
 # Static files  (CSS, JavaScript, Images)
