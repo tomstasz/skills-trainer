@@ -8,6 +8,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - web_network
   web:
     container_name: skills-trainer
     restart: always
@@ -21,7 +23,6 @@ services:
     depends_on:
       - db
     networks:
-      - db_network
       - web_network
   nginx:
     container_name: nginx
@@ -36,8 +37,6 @@ services:
     depends_on: 
       - appseed-app
 networks:
-  db_network:
-    driver: bridge
   web_network:
     driver: bridge
  
