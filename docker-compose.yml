@@ -24,18 +24,18 @@ services:
       - db
     networks:
       - web_network
-  nginx:
-    container_name: nginx
-    restart: always
-    image: "nginx:latest"
-    ports:
-      - "85:85"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-    networks:
-      - web_network
-    depends_on: 
-      - appseed-app
+  # nginx:
+  #   container_name: nginx
+  #   restart: always
+  #   image: "nginx:latest"
+  #   ports:
+  #     - "85:85"
+  #   volumes:
+  #     - ./nginx:/etc/nginx/conf.d
+  #   networks:
+  #     - web_network
+  #   depends_on:
+  #     - appseed-app
 networks:
   web_network:
     driver: bridge
