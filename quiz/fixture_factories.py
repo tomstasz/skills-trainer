@@ -6,6 +6,24 @@ from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 from quiz.models import Question
 
 
+SCORE_DATA = {
+    "general_score": 5,
+    "junior_score": 0,
+    "number_of_junior_series": 0,
+    "regular_score": 4,
+    "number_of_regular_series": 2,
+    "senior_score": 1,
+    "number_of_senior_series": 1,
+    "used_ids": [11, 3, 5, 29, 9, 28, 26, 27, 19],
+    "seniority_level": 2,
+    "num_in_series": 3,
+    "max_num_of_questions": 9,
+    "categories": [1, 2],
+    "technologies": [1, 2, 4],
+    "finished_series": {"1": 0, "2": 2, "3": 1},
+}
+
+
 class CategoryDictFactory(factory.DictFactory):
     name = FuzzyText(length=10)
 
@@ -56,3 +74,4 @@ class QuizDictFactory(factory.DictFactory):
 class ScoreDictFactory(factory.DictFactory):
     quiz = factory.SubFactory(QuizDictFactory)
     seniority = factory.SubFactory(SeniorityDictFactory)
+    score_data = SCORE_DATA

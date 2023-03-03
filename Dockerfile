@@ -17,7 +17,10 @@ COPY requirements.txt /skills-trainer/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
 
-COPY . /skills-trainer/
+# COPY . /skills-trainer/
+
+COPY ./skillstrainer /skills-trainer/skillstrainer/
+COPY ./quiz /skills-trainer/quiz
 
 # running migrations
 RUN python manage.py migrate
