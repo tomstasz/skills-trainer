@@ -1,6 +1,7 @@
 import pytest
 import requests
 import requests_mock
+import copy
 
 from unittest.mock import Mock, patch
 from django.test import Client, RequestFactory
@@ -17,9 +18,14 @@ from quiz.models import (
     Score,
 )
 
-from quiz.utils import prepare_technologies_in_session
+from quiz.utils import (
+    prepare_technologies_in_session,
+    set_initial_score_data,
+    SENIORITY_CHOICES,
+    save_number_of_finished_series,
+)
 
-from quiz.fixture_factories import ScoreDictFactory
+from quiz.fixture_factories import ScoreDictFactory, SCORE_DATA
 
 
 class TestUtils:
@@ -57,7 +63,7 @@ class TestUtils:
 
         self.score = Score.objects.create(**self.score_data)
 
-    def test_if_prepare_technologies_in_session__adds_technologies_to_session(self, db):
+    def test_if_prepare_technologies_in_session__adds_technologies_to_session(self):
         session = self.request.session
         session["technologies"] = None
         prepare_technologies_in_session(self.request, self.score)
@@ -73,3 +79,39 @@ class TestUtils:
         prepare_technologies_in_session(self.request, self.score)
 
         assert session["technologies"] == expected_data
+
+    def test_if_set_initial_score_data__adds_correct_data(self):
+        updated_score_data = set_initial_score_data(self.quiz)
+        quiz_category = [category.pk for category in self.quiz.category.all()]
+        quiz_technology = [technology.pk for technology in self.quiz.technology.all()]
+
+        assert (
+            int(self.quiz.number_of_questions / len(SENIORITY_CHOICES))
+            == updated_score_data["num_in_series"]
+        )
+        assert (
+            self.quiz.number_of_questions == updated_score_data["max_num_of_questions"]
+        )
+        for quiz_cat, score_cat in zip(quiz_category, updated_score_data["categories"]):
+            assert quiz_cat == score_cat
+        for quiz_tech, score_tech in zip(
+            quiz_technology, updated_score_data["technologies"]
+        ):
+            assert quiz_tech == score_tech
+        assert "finished_series" in updated_score_data.keys()
+
+    def test_if_number_of_finished_series__is_saved(self):
+        initial_score_data = set_initial_score_data(self.quiz)
+        score = copy.deepcopy(self.score)
+        score.score_data = initial_score_data
+        score.score_data["finished_series"] = {"1": 1, "2": 1, "3": 1}
+
+        assert score.score_data["number_of_junior_series"] == 0
+        assert score.score_data["number_of_regular_series"] == 0
+        assert score.score_data["number_of_senior_series"] == 0
+
+        save_number_of_finished_series(score)
+
+        assert score.score_data["number_of_junior_series"] == 1
+        assert score.score_data["number_of_regular_series"] == 1
+        assert score.score_data["number_of_senior_series"] == 1
