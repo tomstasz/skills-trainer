@@ -26,6 +26,10 @@ from quiz.utils import (
     template_choice,
     check_question_type_to_update_score,
     update_score,
+    del_quiz_session_data,
+    del_session_keys,
+    draw_questions,
+    save_number_of_finished_series,
 )
 
 from quiz.fixture_factories import (
@@ -33,6 +37,7 @@ from quiz.fixture_factories import (
     SCORE_DATA,
     AnswerDictFactory,
     AuthorDictFactory,
+    QuestionDictFactory,
 )
 
 
@@ -331,3 +336,69 @@ class TestUtils:
         assert score.score_data["junior_score"] == 0
         assert score.score_data["regular_score"] == 0
         assert score.score_data["senior_score"] == 0
+
+    def test_del_quiz_session_data(self):
+        self.request.session["quiz_pk"] = "test quiz pk"
+        self.request.session["selected_technologies"] = "test technologies"
+        del_quiz_session_data(self.request)
+
+        assert self.request.session.get("quiz_pk") == None
+        assert self.request.session.get("selected_technologies") == None
+
+    def test_del_session_keys(self):
+        self.request.session["technologies"] = "test technologies"
+        self.request.session["current_technology"] = "test current tech"
+        self.request.session["training"] = "test training"
+        del_session_keys(self.request)
+
+        assert self.request.session.get("technologies") == None
+        assert self.request.session.get("current_technology") == None
+        assert self.request.session.get("training") == None
+
+    def test_draw_questions__when_next_id_in_db(self, db):
+        used_ids = None
+        self.question.seniority.level = 1
+        self.question.category.pk = 1
+        self.question.technology.pk = 1
+        drawn_ids = draw_questions(
+            self.question.seniority.level,
+            [self.question.category.pk],
+            self.question.technology.pk,
+            used_ids,
+        )
+
+        assert self.question.pk == drawn_ids
+
+    def test_draw_questions__when_next_id_not_in_db(self, db):
+        used_ids = None
+        self.question.seniority.level = 2
+        self.question.category.pk = 1
+        self.question.technology.pk = 1
+        drawn_ids = draw_questions(
+            self.question.seniority.level,
+            [self.question.category.pk],
+            self.question.technology.pk,
+            used_ids,
+        )
+
+        assert drawn_ids == None
+
+    def test_save_number_of_finished_series(self):
+        score = copy.deepcopy(self.score)
+        score.score_data["number_of_junior_series"] = 0
+        score.score_data["number_of_regular_series"] = 0
+        score.score_data["number_of_senior_series"] = 0
+        result = save_number_of_finished_series(score)
+
+        assert (
+            result.score_data["number_of_junior_series"]
+            == result.score_data["finished_series"]["1"]
+        )
+        assert (
+            result.score_data["number_of_regular_series"]
+            == result.score_data["finished_series"]["2"]
+        )
+        assert (
+            result.score_data["number_of_senior_series"]
+            == result.score_data["finished_series"]["3"]
+        )
