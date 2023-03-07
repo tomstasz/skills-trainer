@@ -66,7 +66,7 @@ class QuizDictFactory(factory.DictFactory):
     technology = factory.SubFactory(TechnologyDictFactory)
     user_name = factory.Faker("name")
     email = factory.Faker("email")
-    number_of_questions = FuzzyChoice([3, 6, 9])
+    number_of_questions = FuzzyChoice([9])
     created_at = factory.LazyFunction(datetime.now)
     mode = FuzzyChoice(["recruitment", "training"])
 

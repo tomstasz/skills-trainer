@@ -29,7 +29,15 @@ from quiz.utils import (
     del_quiz_session_data,
     del_session_keys,
     draw_questions,
-    save_number_of_finished_series,
+    calculate_percentage,
+    calculate_if_higher_seniority,
+    calculate_multiplayer,
+    update_finished_series_status,
+    update_seniority_status,
+    update_technology_status,
+    is_current_pk_used,
+    is_max_questions_in_score_used,
+    is_max_series_in_score_used,
 )
 
 from quiz.fixture_factories import (
@@ -54,13 +62,16 @@ class TestUtils:
         self.client = Client()
 
         self.score_data = ScoreDictFactory.build()
+        self.next_score_data = ScoreDictFactory.build()
         self.quiz_data = self.score_data["quiz"]
         self.category_data = self.score_data["quiz"]["category"]
         self.technology_data = self.score_data["quiz"]["technology"]
+        self.next_technology_data = self.next_score_data["quiz"]["technology"]
         self.seniority_data = self.score_data["seniority"]
 
         self.category = Category.objects.create(**self.category_data)
         self.technology = Technology.objects.create(**self.technology_data)
+        self.next_technology = Technology.objects.create(**self.next_technology_data)
         self.seniority = Seniority.objects.create(**self.seniority_data)
 
         del self.score_data["quiz"]["category"]
@@ -68,18 +79,26 @@ class TestUtils:
 
         self.quiz = Quiz.objects.create(**self.score_data["quiz"])
         self.quiz.category.set([self.category])
-        self.quiz.technology.set([self.technology])
+        self.quiz.technology.set([self.technology, self.next_technology])
+        self.single_serie = int(self.quiz.number_of_questions / len(SENIORITY_CHOICES))
 
         self.score_data["quiz"] = self.quiz
         self.score_data["seniority"] = self.seniority
         self.score_data["technology"] = self.technology
 
+        self.next_score_data["quiz"] = self.quiz
+        self.next_score_data["seniority"] = self.seniority
+        self.next_score_data["technology"] = self.next_technology
+        self.next_score = Score.objects.create(**self.next_score_data)
+
         self.score = Score.objects.create(**self.score_data)
-        self.score.score_data["general_score"] = 0
-        self.score.score_data["junior_score"] = 0
-        self.score.score_data["regular_score"] = 0
-        self.score.score_data["senior_score"] = 0
-        self.score.score_data["seniority_level"] = 1
+        self.null_score = copy.deepcopy(self.score)
+        self.null_score.score_data["general_score"] = 0
+        self.null_score.score_data["junior_score"] = 0
+        self.null_score.score_data["regular_score"] = 0
+        self.null_score.score_data["senior_score"] = 0
+        self.null_score.score_data["seniority_level"] = 1
+        self.null_score.score_data["finished_series"] = {"1": 0, "2": 0, "3": 0}
 
         self.answer_data = AnswerDictFactory.build()
         self.author_data = AuthorDictFactory.build()
@@ -132,7 +151,7 @@ class TestUtils:
             assert quiz_tech == score_tech
         assert "finished_series" in updated_score_data.keys()
 
-    def test_if_number_of_finished_series__is_saved(self):
+    def test_number_of_finished_series(self):
         initial_score_data = set_initial_score_data(self.quiz)
         score = copy.deepcopy(self.score)
         score.score_data = initial_score_data
@@ -160,8 +179,7 @@ class TestUtils:
             assert template == expected_result
 
     def test_update_score(self):
-        score = copy.deepcopy(self.score)
-        score = update_score(score)
+        score = update_score(self.null_score)
 
         assert score.score_data["general_score"] == 1
         assert score.score_data["junior_score"] == 1
@@ -192,9 +210,8 @@ class TestUtils:
             path=self.url,
             data={"ans": self.answer[0].text, "csrfmiddlewaretoken": "xxx"},
         )
-        score = copy.deepcopy(self.score)
         score = check_question_type_to_update_score(
-            post_request, self.question, self.answer, score
+            post_request, self.question, self.answer, self.null_score
         )
 
         assert score.score_data["general_score"] == 1
@@ -230,9 +247,8 @@ class TestUtils:
             path=self.url,
             data={"ans": self.answer[0].text, "csrfmiddlewaretoken": "xxx"},
         )
-        score = copy.deepcopy(self.score)
         score = check_question_type_to_update_score(
-            post_request, self.question, self.answer, score
+            post_request, self.question, self.answer, self.null_score
         )
 
         assert score.score_data["general_score"] == 1
@@ -272,9 +288,8 @@ class TestUtils:
                 "csrfmiddlewaretoken": "xxx",
             },
         )
-        score = copy.deepcopy(self.score)
         score = check_question_type_to_update_score(
-            post_request, self.question, self.answer, score
+            post_request, self.question, self.answer, self.null_score
         )
 
         assert score.score_data["general_score"] == 1
@@ -309,9 +324,8 @@ class TestUtils:
         post_request = RequestFactory().post(
             path=self.url, data={"ans": "wrong answer", "csrfmiddlewaretoken": "xxx"}
         )
-        score = copy.deepcopy(self.score)
         score = check_question_type_to_update_score(
-            post_request, self.question, self.answer, score
+            post_request, self.question, self.answer, self.null_score
         )
 
         assert score.score_data["general_score"] == 0
@@ -327,9 +341,8 @@ class TestUtils:
             path=self.url,
             data={f"wrong pk": "wrong answer", "csrfmiddlewaretoken": "xxx"},
         )
-        score = copy.deepcopy(self.score)
         score = check_question_type_to_update_score(
-            post_request, self.question, self.answer, score
+            post_request, self.question, self.answer, self.null_score
         )
 
         assert score.score_data["general_score"] == 0
@@ -402,3 +415,186 @@ class TestUtils:
             result.score_data["number_of_senior_series"]
             == result.score_data["finished_series"]["3"]
         )
+
+    def test_calculate_percentage(self):
+        ctx = calculate_percentage(self.quiz)
+
+        expected_result = {
+            self.score.technology.name: {
+                "general_score": 55.6,
+                "regular_score": 66.7,
+                "senior_score": 33.3,
+                "regular_questions": SCORE_DATA["number_of_regular_series"]
+                * self.single_serie,
+                "senior_questions": SCORE_DATA["number_of_senior_series"]
+                * self.single_serie,
+                "seniority": self.seniority.level,
+            },
+            self.next_score.technology.name: {
+                "general_score": 55.6,
+                "regular_score": 66.7,
+                "senior_score": 33.3,
+                "regular_questions": SCORE_DATA["number_of_regular_series"]
+                * self.single_serie,
+                "senior_questions": SCORE_DATA["number_of_senior_series"]
+                * self.single_serie,
+                "seniority": self.seniority.level,
+            },
+        }
+
+        assert "junior_score" not in ctx[self.score.technology.name].keys()
+        assert ctx == expected_result
+
+    def test_calculate_multiplayer__if_num_of_finished_series_is_more_than_one(self):
+        expected_result = 100 / (
+            self.score.score_data["finished_series"]["2"] * self.single_serie
+        )
+
+        multiplayer = calculate_multiplayer(
+            2, self.score.score_data["finished_series"], self.single_serie
+        )
+
+        assert multiplayer == expected_result
+
+    def test_calculate_multiplayer__if_num_of_finished_series_is_equal_one(self):
+        expected_result = 100 / self.single_serie
+
+        multiplayer = calculate_multiplayer(
+            3, self.score.score_data["finished_series"], self.single_serie
+        )
+
+        assert multiplayer == expected_result
+
+    def test_calculate_if_higher_seniority__when_result_high(self):
+        result = calculate_if_higher_seniority(self.score, 2)
+
+        assert result == True
+
+    def test_calculate_if_higher_seniority__when_result_too_low(self):
+        result = calculate_if_higher_seniority(self.score, 3)
+
+        assert result == False
+
+    def test_update_finished_series_status(self):
+        expected_result = {"1": 2, "2": 1, "3": 0}
+        update_finished_series_status(self.null_score, 1)
+        update_finished_series_status(self.null_score, 2)
+        update_finished_series_status(self.null_score, 1)
+
+        assert self.null_score.score_data["finished_series"] == expected_result
+
+    def test_if_update_seniority_status__upgrade_seniority(self):
+        update_finished_series_status(self.null_score, 1)
+        update_seniority_status(self.null_score, 1, seniority_change_flag=True)
+
+        assert self.null_score.score_data["seniority_level"] == 2
+
+    def test_if_update_seniority_status__downgrade_seniority(self):
+        self.null_score.score_data["seniority_level"] = 2
+        update_seniority_status(self.null_score, 2, seniority_change_flag=False)
+
+        assert self.null_score.score_data["seniority_level"] == 1
+
+    def test_if_update_seniority_status__keep_current_seniority(self):
+        update_finished_series_status(self.null_score, 1)
+        update_finished_series_status(self.null_score, 2)
+        self.null_score.score_data["seniority_level"] = 1
+        update_seniority_status(self.null_score, 1, seniority_change_flag=True)
+
+        assert self.null_score.score_data["seniority_level"] == 1
+
+    def test_if_update_technology_status__change_technology(self):
+        session = self.request.session
+        session["technologies"] = [
+            self.score.technology.pk,
+            self.next_score.technology.pk,
+        ]
+        score, is_quiz_finished = update_technology_status(
+            self.request, self.score, self.quiz.pk
+        )
+
+        assert self.score.technology.pk not in session["technologies"]
+        assert is_quiz_finished == False
+        assert len(session["technologies"]) == 1
+        assert session["current_technology"] == self.next_score.technology.pk
+        assert score.technology.pk == self.next_score.technology.pk
+
+    def test_if_update_technology_status__not_remove_technology_when_no_current_tech_in_session(
+        self,
+    ):
+        session = self.request.session
+        session["technologies"] = [self.next_score.technology.pk]
+        score, is_quiz_finished = update_technology_status(
+            self.request, self.score, self.quiz.pk
+        )
+
+        assert len(session["technologies"]) == 1
+        assert is_quiz_finished == False
+
+    def test_if_update_technology_status__not_change_tech_and_finish_quiz(self):
+        session = self.request.session
+        session["technologies"] = [self.score.technology.pk]
+        score, is_quiz_finished = update_technology_status(
+            self.request, self.score, self.quiz.pk
+        )
+
+        assert len(session["technologies"]) == 0
+        assert is_quiz_finished == True
+        assert "current_technology" not in session.keys()
+        assert score.technology.pk == self.score.technology.pk
+
+    def test_if_update_technology_status__not_change_tech_if_used_ids_not_full(self):
+        session = self.request.session
+        session["technologies"] = [
+            self.score.technology.pk,
+            self.next_score.technology.pk,
+        ]
+        self.score.score_data["used_ids"] = []
+        score, is_quiz_finished = update_technology_status(
+            self.request, self.score, self.quiz.pk
+        )
+
+        assert len(session["technologies"]) == 2
+        assert is_quiz_finished == False
+        assert "current_technology" not in session.keys()
+        assert score.technology.pk == self.score.technology.pk
+
+    def test_is_current_pk_used__when_pk_used(self):
+        self.score.score_data["used_ids"].append(29)
+        self.score.save()
+        result = is_current_pk_used(self.quiz, 29)
+
+        assert result == True
+
+    def test_is_current_pk_used__when_pk_not_used(self):
+        result = is_current_pk_used(self.quiz, 9999999)
+
+        assert result == False
+
+    def test_is_max_questions_in_score_used__when_used_ids_is_not_full(self):
+        assert (
+            len(self.score.score_data["used_ids"]) < self.score.quiz.number_of_questions
+        )
+        result = is_max_questions_in_score_used(self.score)
+
+        assert result == False
+
+    def test_is_max_questions_in_score_used__when_used_ids_is_full(self):
+        self.score.score_data["used_ids"] += [1, 2, 3, 4, 5, 6, 7, 8]
+        assert (
+            len(self.score.score_data["used_ids"])
+            == self.score.quiz.number_of_questions
+        )
+        result = is_max_questions_in_score_used(self.score)
+
+        assert result == True
+
+    def test_is_max_series_in_score_used__when_all_series_used(self):
+        result = is_max_series_in_score_used(self.score)
+
+        assert result == True
+
+    def test_is_max_series_in_score_used__when_not_all_series_used(self):
+        result = is_max_series_in_score_used(self.null_score)
+
+        assert result == False

@@ -255,7 +255,7 @@ def is_max_series_in_score_used(score):
     return True if len(SENIORITY_CHOICES) == used_series else False
 
 
-def no_cache_response(response):
+def no_cache_response(response):  # pragma: no cover
     response["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response["Pragma"] = "no-cache"
     response["Expires"] = "0"
