@@ -57,13 +57,9 @@ class QuizView(View):
 
     def post(self, request):
         ctx = dict()
-        if (
-            "timezone" in request.POST
-            and request.session.get("django_timezone") != request.POST.get("timezone")
-            and "email" not in request.POST
-        ):
+        if "timezone" in request.POST and "email" not in request.POST:
             request.session["django_timezone"] = request.POST["timezone"]
-            return redirect("/")
+            return redirect(reverse("quiz:quiz-view"))
         selected_technologies = list()
         form = QuizForm(request.POST)
         if form.is_valid():

@@ -1,10 +1,7 @@
 import pytest
-import requests
-import requests_mock
 import copy
 
-from unittest.mock import Mock, patch
-from django.test import Client, RequestFactory
+from django.test import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
 
 from quiz.models import (
@@ -45,7 +42,6 @@ from quiz.fixture_factories import (
     SCORE_DATA,
     AnswerDictFactory,
     AuthorDictFactory,
-    QuestionDictFactory,
 )
 
 
@@ -58,8 +54,6 @@ class TestUtils:
         middleware = SessionMiddleware(self.request)
         middleware.process_request(self.request)
         self.request.session.save()
-
-        self.client = Client()
 
         self.score_data = ScoreDictFactory.build()
         self.next_score_data = ScoreDictFactory.build()
