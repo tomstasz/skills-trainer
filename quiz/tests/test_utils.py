@@ -1,19 +1,6 @@
-import pytest
 import copy
 
 from django.test import RequestFactory
-from django.contrib.sessions.middleware import SessionMiddleware
-
-from quiz.models import (
-    Answer,
-    Author,
-    Category,
-    Technology,
-    Seniority,
-    Question,
-    Quiz,
-    Score,
-)
 
 from quiz.utils import (
     prepare_technologies_in_session,
@@ -36,78 +23,13 @@ from quiz.utils import (
     is_max_questions_in_score_used,
     is_max_series_in_score_used,
 )
+from quiz.fixture_factories import SCORE_DATA
+from quiz.tests.mixins import TestUtilMixin
 
-from quiz.fixture_factories import (
-    ScoreDictFactory,
-    SCORE_DATA,
-    AnswerDictFactory,
-    AuthorDictFactory,
-)
+QUESTION_TYPES = ("open", "multiple choice", "true/false")
 
 
-class TestUtils:
-    @pytest.fixture(autouse=True)
-    def setup(self, db):
-        self.url = "https://www.example.com/"
-        # prepare session mock
-        self.request = RequestFactory().get(self.url)
-        middleware = SessionMiddleware(self.request)
-        middleware.process_request(self.request)
-        self.request.session.save()
-
-        self.score_data = ScoreDictFactory.build()
-        self.next_score_data = ScoreDictFactory.build()
-        self.quiz_data = self.score_data["quiz"]
-        self.category_data = self.score_data["quiz"]["category"]
-        self.technology_data = self.score_data["quiz"]["technology"]
-        self.next_technology_data = self.next_score_data["quiz"]["technology"]
-        self.seniority_data = self.score_data["seniority"]
-
-        self.category = Category.objects.create(**self.category_data)
-        self.technology = Technology.objects.create(**self.technology_data)
-        self.next_technology = Technology.objects.create(**self.next_technology_data)
-        self.seniority = Seniority.objects.create(**self.seniority_data)
-
-        del self.score_data["quiz"]["category"]
-        del self.score_data["quiz"]["technology"]
-
-        self.quiz = Quiz.objects.create(**self.score_data["quiz"])
-        self.quiz.category.set([self.category])
-        self.quiz.technology.set([self.technology, self.next_technology])
-        self.single_serie = int(self.quiz.number_of_questions / len(SENIORITY_CHOICES))
-
-        self.score_data["quiz"] = self.quiz
-        self.score_data["seniority"] = self.seniority
-        self.score_data["technology"] = self.technology
-
-        self.next_score_data["quiz"] = self.quiz
-        self.next_score_data["seniority"] = self.seniority
-        self.next_score_data["technology"] = self.next_technology
-        self.next_score = Score.objects.create(**self.next_score_data)
-
-        self.score = Score.objects.create(**self.score_data)
-        self.null_score = copy.deepcopy(self.score)
-        self.null_score.score_data["general_score"] = 0
-        self.null_score.score_data["junior_score"] = 0
-        self.null_score.score_data["regular_score"] = 0
-        self.null_score.score_data["senior_score"] = 0
-        self.null_score.score_data["seniority_level"] = 1
-        self.null_score.score_data["finished_series"] = {"1": 0, "2": 0, "3": 0}
-
-        self.answer_data = AnswerDictFactory.build()
-        self.author_data = AuthorDictFactory.build()
-        self.question_data = self.answer_data["question"]
-        self.author = Author.objects.create(**self.author_data)
-
-        self.question_data["category"] = self.category
-        self.question_data["technology"] = self.technology
-        self.question_data["seniority"] = self.seniority
-        self.question_data["author"] = self.author
-        self.question = Question.objects.create(**self.question_data)
-
-        self.answer_data["question"] = self.question
-        self.answer = [Answer.objects.create(**self.answer_data)]
-
+class TestUtils(TestUtilMixin):
     def test_if_prepare_technologies_in_session__adds_technologies_to_session(self):
         session = self.request.session
         session["technologies"] = None
@@ -162,13 +84,12 @@ class TestUtils:
         assert score.score_data["number_of_senior_series"] == 1
 
     def test_template_choice(self):
-        question_types = ("open", "multiple choice", "true/false")
         expected_results = (
             "single_question_open.html",
             "single_question.html",
             "boolean_question.html",
         )
-        for question_type, expected_result in zip(question_types, expected_results):
+        for question_type, expected_result in zip(QUESTION_TYPES, expected_results):
             template = template_choice(question_type)
             assert template == expected_result
 
@@ -199,7 +120,7 @@ class TestUtils:
     def test_check_question_type_to_update_score__changes_score_when_question_is_boolean_type(
         self,
     ):
-        self.question.question_type = "true/false"
+        self.question.question_type = QUESTION_TYPES[2]
         post_request = RequestFactory().post(
             path=self.url,
             data={"ans": self.answer[0].text, "csrfmiddlewaretoken": "xxx"},
@@ -273,7 +194,7 @@ class TestUtils:
     def test_check_question_type_to_update_score__changes_score_when_question_is_multichoice_type(
         self,
     ):
-        self.question.question_type = "multiple choice"
+        self.question.question_type = QUESTION_TYPES[1]
         self.answer[0].is_correct = True
         post_request = RequestFactory().post(
             path=self.url,
@@ -314,7 +235,7 @@ class TestUtils:
     def test_check_question_type_to_update_score__not_changes_score_when_answer_is_wrong(
         self,
     ):
-        self.question.question_type = "true/false"
+        self.question.question_type = QUESTION_TYPES[2]
         post_request = RequestFactory().post(
             path=self.url, data={"ans": "wrong answer", "csrfmiddlewaretoken": "xxx"}
         )
@@ -330,7 +251,7 @@ class TestUtils:
     def test_check_question_type_to_update_score__not_changes_score_when_answer_is_wrong_and_question_is_multichoice_type(
         self,
     ):
-        self.question.question_type = "multiple choice"
+        self.question.question_type = QUESTION_TYPES[1]
         post_request = RequestFactory().post(
             path=self.url,
             data={f"wrong pk": "wrong answer", "csrfmiddlewaretoken": "xxx"},
