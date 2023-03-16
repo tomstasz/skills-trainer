@@ -1,5 +1,6 @@
 import json
 import secrets
+import random
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -181,7 +182,9 @@ class QuestionView(View):
         ctx["time"] = question.time
         ctx["quiz"] = quiz
         if question.question_type == MULTIPLE_CHOICE:
-            ctx["answers"] = list(answers)
+            answers = list(answers)
+            random.shuffle(answers)
+            ctx["answers"] = answers
         template = template_choice(question.question_type)
         response = TemplateResponse(request, template, ctx)
         response = no_cache_response(response)
