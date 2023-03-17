@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-15 10:15+0100\n"
+"POT-Creation-Date: 2023-03-17 11:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,7 +35,11 @@ msgid "technology"
 msgstr ""
 
 #: quiz/models.py:47
-msgid "User Name"
+msgid "Participant Name"
+msgstr ""
+
+#: quiz/models.py:48
+msgid "Participant Email"
 msgstr ""
 
 #: quiz/models.py:50
@@ -59,15 +63,15 @@ msgstr ""
 msgid "Seniority"
 msgstr ""
 
-#: quiz/views.py:39
+#: quiz/views.py:40
 msgid "Warsaw"
 msgstr ""
 
-#: quiz/views.py:40
+#: quiz/views.py:41
 msgid "New York"
 msgstr ""
 
-#: quiz/views.py:118
+#: quiz/views.py:115
 msgid ""
 "Quiz will not be generated without setting seniority levels.\n"
 "                                Please try to fill the fields again."
@@ -87,12 +91,12 @@ msgid "Correct answers:"
 msgstr ""
 
 #: templates/boolean_question.html:29 templates/boolean_question.html:39
-#: templates/question-search.html:56
+#: templates/question-search.html:58
 msgid "True"
 msgstr ""
 
 #: templates/boolean_question.html:31 templates/boolean_question.html:42
-#: templates/question-search.html:59
+#: templates/question-search.html:61
 msgid "False"
 msgstr ""
 
@@ -110,19 +114,19 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: templates/index.html:20
+#: templates/index.html:24
 msgid "Time zone:"
 msgstr ""
 
-#: templates/index.html:26
-msgid "Set"
+#: templates/index.html:31
+msgid "Set timezone"
 msgstr ""
 
-#: templates/index.html:34
+#: templates/index.html:47
 msgid "Save"
 msgstr ""
 
-#: templates/index.html:54
+#: templates/index.html:69
 msgid "Quiz Link:"
 msgstr ""
 
@@ -130,11 +134,11 @@ msgstr ""
 msgid "Find a single question (enter id or uuid):"
 msgstr ""
 
-#: templates/question-search.html:25 templates/results.html:21
+#: templates/question-search.html:26 templates/results.html:21
 msgid "Find"
 msgstr ""
 
-#: templates/question-search.html:47 templates/single_question_open.html:35
+#: templates/question-search.html:49 templates/single_question_open.html:35
 msgid "Your answer:"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-15 10:15+0100\n"
+"POT-Creation-Date: 2023-03-17 11:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,8 +37,12 @@ msgid "technology"
 msgstr "Technologia"
 
 #: quiz/models.py:47
-msgid "User Name"
-msgstr "Nazwa użytkownika"
+msgid "Participant Name"
+msgstr "Imię/Nazwisko uczestnika"
+
+#: quiz/models.py:48
+msgid "Participant Email"
+msgstr "Email uczestnika"
 
 #: quiz/models.py:50
 msgid "Number of questions"
@@ -61,15 +65,15 @@ msgstr "Podany adres email jest już zajęty."
 msgid "Seniority"
 msgstr "Poziom zaawansowania"
 
-#: quiz/views.py:39
+#: quiz/views.py:40
 msgid "Warsaw"
 msgstr "Warszawa"
 
-#: quiz/views.py:40
+#: quiz/views.py:41
 msgid "New York"
 msgstr "Nowy Jork"
 
-#: quiz/views.py:118
+#: quiz/views.py:115
 msgid ""
 "Quiz will not be generated without setting seniority levels.\n"
 "                                Please try to fill the fields again."
@@ -92,12 +96,12 @@ msgid "Correct answers:"
 msgstr "Poprawna odpowiedź:"
 
 #: templates/boolean_question.html:29 templates/boolean_question.html:39
-#: templates/question-search.html:56
+#: templates/question-search.html:58
 msgid "True"
 msgstr "Prawda"
 
 #: templates/boolean_question.html:31 templates/boolean_question.html:42
-#: templates/question-search.html:59
+#: templates/question-search.html:61
 msgid "False"
 msgstr "Fałsz"
 
@@ -115,19 +119,19 @@ msgstr "Technologia"
 msgid "Next"
 msgstr "Dalej"
 
-#: templates/index.html:20
+#: templates/index.html:24
 msgid "Time zone:"
 msgstr "Strefa czasowa:"
 
-#: templates/index.html:26
-msgid "Set"
-msgstr "Ustaw"
+#: templates/index.html:31
+msgid "Set timezone"
+msgstr "Ustaw strefę"
 
-#: templates/index.html:34
+#: templates/index.html:47
 msgid "Save"
 msgstr "Zapisz"
 
-#: templates/index.html:54
+#: templates/index.html:69
 msgid "Quiz Link:"
 msgstr "Link do quizu:"
 
@@ -135,11 +139,11 @@ msgstr "Link do quizu:"
 msgid "Find a single question (enter id or uuid):"
 msgstr "Znajdź pojedyncze pytanie (podaj id albo uuid):"
 
-#: templates/question-search.html:25 templates/results.html:21
+#: templates/question-search.html:26 templates/results.html:21
 msgid "Find"
 msgstr "Znajdź"
 
-#: templates/question-search.html:47 templates/single_question_open.html:35
+#: templates/question-search.html:49 templates/single_question_open.html:35
 msgid "Your answer:"
 msgstr "Twoja odpowiedź:"
 

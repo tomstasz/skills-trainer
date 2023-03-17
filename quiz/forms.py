@@ -7,7 +7,14 @@ class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
         exclude = ["created_at"]
-        widgets = {"mode": forms.Select}
+        widgets = {
+            "mode": forms.Select(attrs={"class": "form-control"}),
+            "number_of_questions": forms.Select(attrs={"class": "form-control"}),
+            "user_name": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "category": forms.SelectMultiple(attrs={"class": "form-control"}),
+            "technology": forms.SelectMultiple(attrs={"class": "form-control"}),
+        }
 
     field_order = [
         "user_name",
@@ -31,5 +38,9 @@ class UserEmailForm(forms.ModelForm):
 
 
 class QuestionSearchForm(forms.Form):
-    id = forms.IntegerField(required=False)
-    uuid = forms.UUIDField(required=False)
+    id = forms.IntegerField(
+        required=False, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    uuid = forms.UUIDField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )

@@ -42,9 +42,14 @@ input[type="checkbox"] {
 
 
 .full-div {
-    text-align: center;
+    margin-left: 2%;
     }
 
 .alert-success {
     width:fit-content;
 }
+
+
+html {
+    scroll-behavior: smooth;
+  }

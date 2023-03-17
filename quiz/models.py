@@ -44,8 +44,8 @@ class Quiz(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     category = models.ManyToManyField("Category", verbose_name=_("category"))
     technology = models.ManyToManyField("Technology", verbose_name=_("technology"))
-    user_name = models.CharField(_("User Name"), max_length=120)
-    email = models.CharField(max_length=120, unique=True)
+    user_name = models.CharField(_("Participant Name"), max_length=120)
+    email = models.CharField(_("Participant Email"), max_length=120, unique=True)
     number_of_questions = models.IntegerField(
         _("Number of questions"), choices=NUM_OF_QUESTIONS
     )

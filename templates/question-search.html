@@ -17,14 +17,16 @@
 {% block content %}
 <div class="container">
     <div class="row">
-      <div class="col">
+      <div class="col-sm-5">
         <h3>{% translate "Find a single question (enter id or uuid):" %}</h3>
+        <div class="form-group">
         <form id="question-form" action="" method="post">
             {% csrf_token %}
             {{ question_form.as_p }}
             <button class="btn btn-default" type="submit" id="question-submit">{% translate "Find" %}</button>
         </form>
         <br>
+      </div>
       </div>
       <div class="col">
         <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz.pk }}>
