@@ -14,12 +14,14 @@
 {% block content %}
 <div class="container">
     <div class="row">
-      <div class="col">
+      <div class="col-sm-4">
+        <div class="form-group">
         <form id="result-form" action="{% url 'quiz:result-view' %}" method="post">
             {% csrf_token %}
             {{ quiz_form.as_p }}
             <button class="btn btn-default" type="submit" id="result-submit">{% translate "Find" %}</button>
         </form>
+        </div>
         <br>
       </div>
     </div>

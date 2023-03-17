@@ -34,7 +34,7 @@ class UserEmailForm(forms.ModelForm):
     class Meta:
         model = Quiz
         fields = ["email"]
-        widgets = {"email": forms.Select}
+        widgets = {"email": forms.Select(attrs={"class": "form-control"})}
 
 
 class QuestionSearchForm(forms.Form):
