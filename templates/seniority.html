@@ -5,13 +5,15 @@
 <form id="tech-form" action="" method="post">
     {% csrf_token %}
     {% for technology in selected_technologies %}
-    <div class="font-weight-bold">{{ technology }}: </div>
+        <div class="font-weight-bold">{{ technology }}: </div>
         {% for seniority in seniority_levels %}
-            <input type="radio" name={{ technology }} value={{ seniority.0 }} /> {{ seniority.1 }}
-            <br>
+        <div class="form-check form-check-inline">
+            <label class="form-check-label"> {{ seniority.1 }}
+            <input type="radio" class="form-check-input" name={{ technology }} value={{ seniority.0 }}>
+            </label>
+        </div>
         {% endfor %}
-        <br>
+        <hr>
     {% endfor %}
-    <br>
     <button class="btn btn-default" type="submit" name="tech-submit" value="">{% translate "Generate Quiz Link" %}</button>
 </form>
