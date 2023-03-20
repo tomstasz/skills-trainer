@@ -20,52 +20,52 @@
       <div class="col-sm-5">
         <h3>{% translate "Find a single question (enter id or uuid):" %}</h3>
         <div class="form-group">
-        <form id="question-form" action="" method="post">
-            {% csrf_token %}
-            {{ question_form.as_p }}
-            <button class="btn btn-default" type="submit" id="question-submit">{% translate "Find" %}</button>
-        </form>
-        <br>
-      </div>
+          <form id="question-form" action="" method="post">
+              {% csrf_token %}
+              {{ question_form.as_p }}
+              <button class="btn btn-default" type="submit" id="question-submit">{% translate "Find" %}</button>
+          </form>
+          <br>
+        </div>
       </div>
       <div class="col">
         <div id="question" data-question={{ question.uuid }} data-quiz={{ quiz.pk }}>
           {{ question.text | safe }}
-      </div>
-      <div id="answer">
-        {% if question and question.question_type == "multiple choice" %}
-          <form id="answer-form" action="" method="post">
-            {% csrf_token %}
-            {% for answer in answers %}
-            <label>
-                <input type="checkbox" name={{ answer.pk }} value={{ answer.pk }} class="left">{{ answer.text | safe}}
-            </label>
-            <br>
-            {% endfor %}
-          </form>
-        {% elif question and question.question_type == "open" %}
-          <form id="answer-form" action="" method="post">
-            {% csrf_token %}
-            {% translate "Your answer:" %}
-            <label>
+        </div>
+        <div id="answer">
+          {% if question and question.question_type == "multiple choice" %}
+            <form id="answer-form" action="" method="post">
+              {% csrf_token %}
+              {% for answer in answers %}
+              <label>
+                  <input type="checkbox" name={{ answer.pk }} value={{ answer.pk }} class="left">{{ answer.text | safe}}
+              </label>
+              <br>
+              {% endfor %}
+            </form>
+          {% elif question and question.question_type == "open" %}
+            <form id="answer-form" action="" method="post">
+              {% csrf_token %}
+              {% translate "Your answer:" %}
+              <label>
                 <input type="text" name="ans">
-            </label>
-            <br>
-          </form>
-        {% elif question and question.question_type == "true/false" %}
-          <form id="answer-form" action="" method="post">
-            {% csrf_token %}
-            <label>{% translate "True" %}
-            <input type="radio" name="ans" value="T">
-            </label>
-            <label>{% translate "False" %}
-            <input type="radio" name="ans" value="F">
-            </label>
-            <br>
-          </form>
-        {% endif %}
-      </div>
+              </label>
+              <br>
+            </form>
+          {% elif question and question.question_type == "true/false" %}
+            <form id="answer-form" action="" method="post">
+              {% csrf_token %}
+              <label>{% translate "True" %}
+                <input type="radio" name="ans" value="T">
+              </label>
+              <label>{% translate "False" %}
+                <input type="radio" name="ans" value="F">
+              </label>
+              <br>
+            </form>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
+</div>
 {% endblock content %}

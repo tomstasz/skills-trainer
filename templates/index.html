@@ -18,59 +18,59 @@
 <div class="full-div">
     <div class="row">
         <div class="col-sm-3">
-<div class="form-group">
-<form id="timezone-form" action="{% url 'quiz:quiz-view' %}" method="post">
-    {% csrf_token %}
-    <label for="timezone">{% translate "Time zone:" %}</label> <br>
-    <select name="timezone" class="form-control">
-        {% for city, tz in timezones.items %}
-        <option value="{{ tz }}"{% if tz == TIME_ZONE %}selected{% elif tz == "" %}selected{% endif %}>{{ city }}</option>
-        {% endfor %}
-    </select>
-    <br>
-    <button class="btn btn-default" type="submit" id="timezone-submit">{% translate "Set timezone" %}</button>
-</form>
-</div>
-</div>
-</div>
+            <div class="form-group">
+                <form id="timezone-form" action="{% url 'quiz:quiz-view' %}" method="post">
+                    {% csrf_token %}
+                    <label for="timezone">{% translate "Time zone:" %}</label> <br>
+                    <select name="timezone" class="form-control">
+                        {% for city, tz in timezones.items %}
+                        <option value="{{ tz }}"{% if tz == TIME_ZONE %}selected{% elif tz == "" %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <button class="btn btn-default" type="submit" id="timezone-submit">{% translate "Set timezone" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
 <hr>
 <!--  -->
 <h1>Skillstrainer quiz generator</h1>
 <br>
 <div class="row">
-<div class="col-sm-4">
-<div class="form-group">
-<form id="quiz-form" action="" method="post">
-    {% csrf_token %}
-    {{ quiz_form.as_p }}
-    <button class="btn btn-default" type="submit">{% translate "Save" %}</button>
-</form>
-{% if quiz_form_err and not message and not first_question_uuid %}
-    <br>
-    {% for error in quiz_form_err.non_field_errors %}
-    <div class="alert alert-danger">
-        <strong>{{ error|escape }}</strong>
-    </div>
-    {% endfor %}
-    {% endif %}
-<br>
-<div id="seniority-div">
-{% if request.POST and selected_technologies %}
-    {% include 'seniority.html' %}
-{% elif request.POST and message %}
-    <div class="alert alert-danger">
-        <strong>{{ message }}</strong>
-    </div>
-{% endif %}
-</div>
+    <div class="col-sm-4">
+        <div class="form-group">
+            <form id="quiz-form" action="" method="post">
+                {% csrf_token %}
+                {{ quiz_form.as_p }}
+                <button class="btn btn-default" type="submit">{% translate "Save" %}</button>
+            </form>
+            {% if quiz_form_err and not message and not first_question_uuid %}
+                <br>
+                {% for error in quiz_form_err.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <br>
+            <div id="seniority-div">
+                {% if request.POST and selected_technologies %}
+                    {% include 'seniority.html' %}
+                {% elif request.POST and message %}
+                    <div class="alert alert-danger">
+                        <strong>{{ message }}</strong>
+                    </div>
+                {% endif %}
+            </div>
 
-{% if request.POST and first_question_uuid %}
-<span class="badge badge-default">{% translate "Quiz Link:" %}</span>
-    <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_uuid }}?q={{ quiz_pk }}"></a>
-{% endif %}
-</div>
-</div>
+            {% if request.POST and first_question_uuid %}
+                <span class="badge badge-default">{% translate "Quiz Link:" %}</span>
+                    <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_uuid }}?q={{ quiz_pk }}"></a>
+            {% endif %}
+        </div>
+    </div>
 </div>
 </div>
 {% endblock content %}

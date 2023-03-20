@@ -37,10 +37,10 @@
                     <form id="answer-form" action="" method="post">
                         {% csrf_token %}
                         <label>{% translate "True" %}
-                        <input type="radio" name="ans" value="T">
+                            <input type="radio" name="ans" value="T">
                         </label>
                         <label>{% translate "False" %}
-                        <input type="radio" name="ans" value="F">
+                            <input type="radio" name="ans" value="F">
                         </label>
                         <br>
                         <button class="btn btn-default" type="submit" id="question-submit">{% translate "Send" %}</button>
