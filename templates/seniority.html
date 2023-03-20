@@ -5,9 +5,10 @@
 <form id="tech-form" action="" method="post">
     {% csrf_token %}
     {% for technology in selected_technologies %}
-        <b>{{ technology }}: </b>
+    <div class="font-weight-bold">{{ technology }}: </div>
         {% for seniority in seniority_levels %}
             <input type="radio" name={{ technology }} value={{ seniority.0 }} /> {{ seniority.1 }}
+            <br>
         {% endfor %}
         <br>
     {% endfor %}
