@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 11:00+0100\n"
+"POT-Creation-Date: 2023-03-24 13:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,15 +131,15 @@ msgstr "Ustaw strefę"
 msgid "Save"
 msgstr "Zapisz"
 
-#: templates/index.html:69
-msgid "Quiz Link:"
-msgstr "Link do quizu:"
+#: templates/index.html:74
+msgid "Copy"
+msgstr "Kopiuj"
 
 #: templates/question-search.html:21
 msgid "Find a single question (enter id or uuid):"
 msgstr "Znajdź pojedyncze pytanie (podaj id albo uuid):"
 
-#: templates/question-search.html:26 templates/results.html:21
+#: templates/question-search.html:26 templates/results.html:22
 msgid "Find"
 msgstr "Znajdź"
 
@@ -153,7 +153,7 @@ msgstr ""
 "Proszę ustawić początkowy poziom zaawansowania dla każdej technologii w "
 "quizie:"
 
-#: templates/seniority.html:15
+#: templates/seniority.html:18
 msgid "Generate Quiz Link"
 msgstr "Wygeneruj link do quizu"
 

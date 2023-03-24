@@ -66,8 +66,14 @@
             </div>
 
             {% if request.POST and first_question_uuid %}
-                <span class="badge badge-default">{% translate "Quiz Link:" %}</span>
-                    <a class="full-link" href="http://127.0.0.1:8000/{{ first_question_uuid }}?q={{ quiz_pk }}"></a>
+                <div class="copy-link">
+                    <input type="text" class="form-control copy-link-input" value="http://127.0.0.1:8000/{{ first_question_uuid }}?q={{ quiz_pk }}"
+                        placeholder="quiz link" id="copy-input" readonly>
+                    <span class="input-group-btn">
+                        <br>
+                        <button class="btn btn-default copy-link-button" type="button" id="copy-button" title={% translate "Copy" %}>{% translate "Copy" %}</button>
+                    </span>
+                </div>
             {% endif %}
         </div>
     </div>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 11:00+0100\n"
+"POT-Creation-Date: 2023-03-24 13:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,15 +126,15 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: templates/index.html:69
-msgid "Quiz Link:"
+#: templates/index.html:74
+msgid "Copy"
 msgstr ""
 
 #: templates/question-search.html:21
 msgid "Find a single question (enter id or uuid):"
 msgstr ""
 
-#: templates/question-search.html:26 templates/results.html:21
+#: templates/question-search.html:26 templates/results.html:22
 msgid "Find"
 msgstr ""
 
@@ -146,7 +146,7 @@ msgstr ""
 msgid "Please set initial seniority for each technology in quiz:"
 msgstr ""
 
-#: templates/seniority.html:15
+#: templates/seniority.html:18
 msgid "Generate Quiz Link"
 msgstr ""
 
