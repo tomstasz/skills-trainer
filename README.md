@@ -3,12 +3,12 @@
 Application usefull either for recruiters or people simply trying to improve their qualifications. By default application generates quiz in the selected IT category/technology, with selected number of questions and seniority (most of the questions in the attached sqlite base are placeholders of course, but fully cappable of running locally). <br>
 
 <p float="left">
-<img src="static/images/Skillstrainer_01.png" alt="Skillstrainer" title="quiz generation process" width="150" height="150"/>
-<img src="static/images/Skillstrainer_02.png" alt="Skillstrainer" title="quiz generation process" width="150" height="150"/>
-<img src="static/images/Skillstrainer_03.png" alt="Skillstrainer" title="exemplary question in recruitment mode" width="150" height="150"/>
-<img src="static/images/Skillstrainer_04.png" alt="Skillstrainer" title="exemplary question in training mode" width="150" height="150"/>
-<img src="static/images/Skillstrainer_05.png" alt="Skillstrainer" title="correct answers in training mode" width="150" height="150"/>
-<img src="static/images/Skillstrainer_06.png" alt="Skillstrainer" title="post quiz graphs" width="150" height="150"/>
+<img src="static/images/Skillstrainer_01.png" alt="Skillstrainer" title="quiz generation process" width="100" height="100"/>
+<img src="static/images/Skillstrainer_02.png" alt="Skillstrainer" title="quiz generation process" width="100" height="100"/>
+<img src="static/images/Skillstrainer_03.png" alt="Skillstrainer" title="exemplary question in recruitment mode" width="100" height="100"/>
+<img src="static/images/Skillstrainer_04.png" alt="Skillstrainer" title="exemplary question in training mode" width="100" height="100"/>
+<img src="static/images/Skillstrainer_05.png" alt="Skillstrainer" title="correct answers in training mode" width="100" height="100"/>
+<img src="static/images/Skillstrainer_06.png" alt="Skillstrainer" title="post quiz graphs" width="100" height="100"/>
 </p>
 
 Main features:
