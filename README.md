@@ -1,6 +1,6 @@
 # skillstrainer
 
-Application usefull either for recruiters or people simply trying to improve their qualifications. By default application generates quiz in the selected IT category/technology, with selected number of questions and seniority (most of the questions in the attached sqlite base are placeholders of course, but fully cappable of running locally). <br>
+Application useful either for recruiters or people simply trying to improve their qualifications. By default application generates quiz in the selected IT category/technology, with selected number of questions and seniority (most of the questions in the attached sqlite base are placeholders of course, but fully cappable of running locally). <br>
 
 <p float="left">
 <img src="static/images/Skillstrainer_01.png" alt="Skillstrainer" title="quiz generation process" width="100" height="100"/>
