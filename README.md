@@ -1,4 +1,4 @@
-# skillstrainer
+# skillstrainer (python 3.10)
 
 Application useful either for recruiters or people simply trying to improve their qualifications. By default application generates quiz in the selected IT category/technology, with selected number of questions and seniority (most of the questions in the attached sqlite base are placeholders of course, but fully cappable of running locally). <br>
 
@@ -23,8 +23,6 @@ Main features:
    options)
    
  * graphical representation of the results (in training mode besides instant feedback during quiz, application will also show results in a form of charts)
- 
- * full POL/ENG translation (activating depending of the browser settings)
  
  * browser buttons assurance (if user tries to use browser buttons to cheat e.g.load previously answered question, application will draw the next one 
    and count current question as ommited - but still counting in final result summary)
