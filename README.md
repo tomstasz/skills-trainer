@@ -24,5 +24,5 @@ Main features:
    
  * graphical representation of the results (in training mode besides instant feedback during quiz, application will also show results in a form of charts)
  
- * browser buttons assurance (if user tries to use browser buttons to cheat e.g.load previously answered question, application will draw the next one 
+ * browser buttons assurance (if user tries to use browser buttons to cheat e.g. load previously answered question, application will draw the next one 
    and count current question as ommited - but still counting in final result summary)
